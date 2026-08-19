@@ -1,0 +1,74 @@
+# ---------------------------------------------------------------------------
+# Infrastructure state containing live pod IDs and public IP addresses.
+# These are machine records, not results. Never publish them.
+# ---------------------------------------------------------------------------
+runpod/fleet.json
+runpod/grow_pod.json
+runpod/probe_pod.json
+runpod/survey_fleet.json
+runpod/balance_baseline.json
+qc_live/round_1/manifest.json
+
+# Anything that looks like a credential, belt and braces.
+*.key
+*.pem
+.env
+*_key.txt
+.runpod_key
+
+# ---------------------------------------------------------------------------
+# Re-downloadable copies of upstream scroll data.
+# This repository redistributes no bulk scroll data; all inputs are public at
+# s3://vesuvius-challenge-open-data and dl.ash2txt.org. These caches are local
+# copies of those inputs and are excluded so that claim stays true.
+# ---------------------------------------------------------------------------
+hunt/meshcache/
+hunt/corpuscache/
+out/survey/v2cache/
+**/cache/
+**/*cache/
+
+# ---------------------------------------------------------------------------
+# Large derived binaries. Every one is regenerable from the scripts in this
+# repo plus public inputs; see DATA.md for the manifest, sizes and the exact
+# command that rebuilds each.
+# ---------------------------------------------------------------------------
+*.npy
+*.parquet
+*.ppm
+*.tif
+*.tiff
+out/survey/maps_shard*/
+out/ink9um_w035/*.tif
+out/ink9um_1203/*.tif
+
+# tifxyz surface geometry we produced ourselves is small and is the only
+# published geometry of its kind on PHerc0813, so it ships despite the *.tif
+# rule above.
+!hunt/pherc0813_meshes/**/*.tif
+
+# ---------------------------------------------------------------------------
+# Working detritus
+# ---------------------------------------------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+report_snapshot_*/
+*.log
+nohup.out
+.DS_Store
+Thumbs.db
+
+# ---------------------------------------------------------------------------
+# Zarr stores. Chunk files are 8 MB each and there are hundreds; all are
+# regenerable intermediates, none is a published result.
+# ---------------------------------------------------------------------------
+*.zarr/
+**/*.zarr/
+
+# Internal review artifacts: pre-publication critique of this work and of
+# unfiled upstream bug reports. Kept locally, not part of the submission.
+report/FACTCHECK_VERDICT.json
+GROUND_TRUTH_AUDIT.json
+issue_drafts/
