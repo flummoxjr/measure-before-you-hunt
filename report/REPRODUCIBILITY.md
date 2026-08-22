@@ -201,7 +201,8 @@ Excluded on purpose: `volume-cartographer`, `cucim` (manylinux-only; see villa P
 | Acceptance-gate battery on a new model | ≤30 tiles | single GPU, minutes | ≈$0–1 |
 | ink_9um probe (control + 2 segments × 2 seeds × 2 dirs + battery) | ~3 GB | 1 pod, ~2 h | ≈$1.15 |
 | Full 2.4 µm band screen (if a model ever passes the gate) | streamed | 6-pod fleet, ~5.5 h | ≈$19–25 projected |
-| **Total Track D cloud spend, entire project** | | | **$5.61** of an $80 cap |
+| Corpus survey, 80 published GP segments (render + infer, both z-directions) | ~80 meshes + volume slabs streamed | 4-pod 5090 fleet, 6.34 GPU-segment-hours | ≈$5.5 |
+| **Total Track D cloud spend, entire project** | | | **≈$11.1** ($5.61 core + ≈$5.5 corpus survey) of an $80 cap |
 
 ---
 
@@ -246,11 +247,11 @@ Packaging rules: keep every `.json`, `.md`, `.png` under `out/`, `qc*/`, `salvag
 
 [BEN: the Google Form at scrollprize.org/prizes requires these — all need your voice/decision:]
 
-- [BEN: submitter name + email (benblack211@gmail.com?) + Discord handle — the workplan notes you still need to join the Discord.]
-- [BEN: prize category — Monthly Progress Prize, Aug 31 2026 deadline.]
-- [BEN: one-paragraph submission description. Suggested skeleton, in your words: per-scroll detectability index for the GP-13 + validated cross-scroll ink instrument with calibrated positive control + quantified transfer-failure characterization of ink_3d on PHerc1203 + the adversarial-QC methodology (2 false positives and 3 method errors caught pre-publication) + upstream tool fixes (PRs #1479/#1480/#1487/#1492, issues #1488–#1490).]
+- Submitter: Ben Black — benblack211@gmail.com — GitHub `flummoxjr`. **[BEN: you still need to join the Discord; add the handle.]**
+- Category: Monthly Progress Prize. Deadline 31 August 2026, 11:59 pm Pacific.
+- Submission description: "A per-scroll detectability index for the thirteen Grand-Prize scrolls on two near-orthogonal axes (scan quality and sheet separability), an ink instrument validated against human-verified letters at AUC 0.999, a screen of every published Grand-Prize segment with that instrument (80/80 rows, 0 of 71 passing a five-gate protocol the control passes 5/5), two whole-volume screens, and three reusable QC gates. No ink was found and none is claimed. Sixteen corrections are published as a ledger, five of them against results inside the report." [BEN: trim to whatever length the form allows — quantified transfer-failure characterization of ink_3d on PHerc1203 + the adversarial-QC methodology (2 false positives and 3 method errors caught pre-publication) + upstream tool fixes (PRs #1479/#1480/#1487/#1492, issues #1488–#1490).]
 - [BEN: repository URL (public before submission) + license name.]
-- [BEN: whether to link LOG.md as the provenance trail — recommended.]
+- Link `LOG.md` as the provenance trail. It is unflattering in places and that is the point: it shows the order things were actually found in, including the wrong turns.
 - [BEN: any claim wording. House rule carried through this report: model detections are never called "letters" or "ink" unless human-verified; the only human-verified letters anywhere in this work are the w035 labels.]
 
 ---

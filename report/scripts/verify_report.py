@@ -248,11 +248,11 @@ checks.append(f"separability axis: 14 scrolls, calibrator ranks 1st ({sc['PHerc0
 # --- 10. PHerc0813 mesh alignment (§2.9.1)
 al = json.load(open(os.path.join(T, "out", "k2c_separability", "pherc0813_mesh_alignment.json")))
 pu = json.load(open(os.path.join(T, "out", "k2c_separability", "published_mesh_alignment.json")))
-if abs(al["median_angle_deg"] - 67.3) > 0.1 or al["n_within_30deg"] != 0 or len(al["meshes"]) != 8:
-    problems.append(f"0813 ALIGNMENT: report 8 meshes, 67.3 deg, 0 within 30 vs "
+if abs(al["median_angle_deg"] - 68.1) > 0.1 or al["n_within_30deg"] != 0 or len(al["meshes"]) != 8:
+    problems.append(f"0813 ALIGNMENT: report 8 meshes, 68.1 deg, 0 within 30 vs "
                     f"{len(al['meshes'])}, {al['median_angle_deg']:.1f}, {al['n_within_30deg']}")
-if abs(pu["median_angle_deg"] - 14.6) > 0.1 or pu["n_within_30deg"] != 7 or len(pu["meshes"]) != 9:
-    problems.append(f"PUBLISHED ALIGNMENT: report 9 meshes, 14.6 deg, 7 within 30 vs "
+if abs(pu["median_angle_deg"] - 13.1) > 0.1 or pu["n_within_30deg"] != 7 or len(pu["meshes"]) != 9:
+    problems.append(f"PUBLISHED ALIGNMENT: report 9 meshes, 13.1 deg, 7 within 30 vs "
                     f"{len(pu['meshes'])}, {pu['median_angle_deg']:.1f}, {pu['n_within_30deg']}")
 checks.append(f"PHerc0813 mesh alignment: ours {al['median_angle_deg']:.1f}° ({al['n_within_30deg']}/8 "
               f"within 30°) vs published {pu['median_angle_deg']:.1f}° ({pu['n_within_30deg']}/9)")
@@ -264,6 +264,37 @@ if "0.036–0.074" in inst and "2.9.1" not in inst:
 if "unresolvable" in inst.lower() and "not" not in inst.lower().split("unresolvable")[0][-80:]:
     pass  # phrasing check only; the substantive assertion is the alignment numbers above
 checks.append("§2.9 modulation claim carries its §2.9.1 diagnosis")
+
+# --- 12. corpus-wide mesh alignment audit (§2.7 point 5)
+ca = json.load(open(os.path.join(T, "out", "k2c_separability", "corpus_alignment.json")))
+csegs = ca["segments"]
+meas = [r for r in csegs if r.get("angle_deg") is not None]
+outside = [r for r in csegs if r.get("status") == "cube mostly outside scanned volume"]
+if len(csegs) != 80 or len(meas) != 56 or len(outside) != 24:
+    problems.append(f"CORPUS ALIGN COVERAGE: report 80 rows / 56 measured / 24 outside vs "
+                    f"{len(csegs)} / {len(meas)} / {len(outside)}")
+if any(r["scroll"] != "PHerc1447" for r in outside):
+    problems.append("CORPUS ALIGN: report says all 24 outside-volume rows are PHerc1447")
+import statistics as _st
+byscroll = {}
+for r in meas:
+    byscroll.setdefault(r["scroll"], []).append(r["angle_deg"])
+for sc, med, w30, n in [("PHerc0800", 3.0, 6, 6), ("PHerc1203", 10.3, 21, 22), ("PHerc1447", 56.6, 9, 28)]:
+    a_ = byscroll.get(sc, [])
+    if len(a_) != n or abs(_st.median(a_) - med) > 0.1 or sum(1 for x in a_ if x < 30) != w30:
+        problems.append(f"CORPUS ALIGN {sc}: report n={n} median={med} within30={w30} vs "
+                        f"n={len(a_)} median={_st.median(a_) if a_ else float('nan'):.1f} "
+                        f"within30={sum(1 for x in a_ if x < 30)}")
+dbg = [r["angle_deg"] for r in meas if "z_dbg_gen" in r["name"]]
+cur = [r["angle_deg"] for r in meas if "z_dbg_gen" not in r["name"]]
+if abs(_st.median(dbg) - 65.8) > 0.1 or abs(_st.median(cur) - 11.1) > 0.1:
+    problems.append(f"CORPUS ALIGN dumps/curated: report 65.8/11.1 vs "
+                    f"{_st.median(dbg):.1f}/{_st.median(cur):.1f}")
+if sum(1 for r in meas if r["angle_deg"] >= 45) != 19:
+    problems.append(f"CORPUS ALIGN >=45: report 19 of 56 vs {sum(1 for r in meas if r['angle_deg'] >= 45)}")
+checks.append(f"corpus alignment audit: {len(meas)}/80 measured, median "
+              f"{_st.median([r['angle_deg'] for r in meas]):.1f} deg, "
+              f"dumps {_st.median(dbg):.1f} vs curated {_st.median(cur):.1f}")
 
 print("CHECKS RUN:")
 for c in checks:

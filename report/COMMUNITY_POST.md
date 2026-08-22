@@ -10,8 +10,8 @@ Ben to post in his own voice — short, useful, no marketing.
 
 > **Scan-quality index for the 13 GP scrolls (+ PHerc0139 as a read anchor)**
 >
-> [BEN: one line on why you built it — "I wanted to know which scrolls were worth GPU time before
-> spending any" is the honest version.]
+> I wanted to know which scrolls were worth GPU time before spending any, and I could not find that
+> published anywhere. So I measured it.
 >
 > I measured every released 9 µm-class GP volume against **its own in-scan noise** — five papyrus
 > ROIs per scroll, air-window noise references validated by a flatness gate, three metrics
@@ -66,7 +66,7 @@ Ben to post in his own voice — short, useful, no marketing.
 
 > **Three reusable gates from a month of failing to find ink**
 >
-> [BEN: one line — "I burned a fleet learning these, so you don't have to" is the true version.]
+> I burned a fleet learning these, so you do not have to.
 >
 > 1. **Pre-fleet model acceptance gate** (~30 tiles, minutes, ≈$1): pipeline-equivalence check,
 >    in-domain control, in-domain distribution reference, firing morphology vs the surface
@@ -81,15 +81,16 @@ Ben to post in his own voice — short, useful, no marketing.
 >
 > 3. **Mesh-vs-lamella alignment check** (seconds, on data you already have). Take the angle between a
 >    grown surface's own normal and the local structure-tensor normal of the volume underneath it. It has a
->    calibrated reference: **published GP meshes sit at 14.6° (7 of 9 within 30°), two random directions sit
+>    calibrated reference: **published GP meshes sit at 13.1° (7 of 9 within 30°), two random directions sit
 >    at 60°.** I wrote it because 8 surfaces I grew on PHerc0813 looked completely healthy — right area, full
->    vertex validity, non-zero surface DN, sensible generation counts — and were sitting at a median **67.3°
->    to the lamellae**, i.e. indistinguishable from randomly oriented. Cause: I ran `vc_grow_seg_from_seed`
->    without `direction_fields` / `normal_grid_path`, which the published pipeline supplies from a
->    structure-tensor normal field. The grower happily produced surfaces that satisfy its own continuity
->    criteria while following nothing. **If you grow surfaces without a normal field, check this before you
->    spend GPU time rendering them** — a surface oblique to the sheets averages away exactly the depth
->    contrast an ink model needs.
+>    vertex validity, non-zero surface DN, sensible generation counts — and were sitting at a median **68.1°
+>    to the lamellae**, i.e. indistinguishable from randomly oriented. I do not yet know why. The obvious
+>    candidate — that I omitted a structure-tensor direction field — is refuted: published meshes grown without one
+>    sit at a median 11.3°, four of them inside 11°. Curvature averaging is excluded too (measuring only the vertices
+>    inside the sampled cube makes it slightly worse, 72.9°). **If you grow surfaces, check this before you spend GPU
+>    time rendering them** — a surface oblique to the sheets averages away exactly the depth contrast an ink model
+>    needs, and it passes every other health check. If anyone knows what makes `vc_grow_seg_from_seed` track or not
+>    track lamellae, I would genuinely like to hear it.
 >
 > All three are checkpoint-agnostic. [BEN: repo link]
 >
@@ -131,7 +132,7 @@ Ben to post in his own voice — short, useful, no marketing.
 > permutation noise. If you are screening prediction maps with a permutation null, this is the
 > failure mode to check for first.
 >
-> Two things I'd flag rather than bury: 23 of the 66 unique surfaces are `z_dbg_gen_*` debug dumps,
+> Two things I'd flag rather than bury: 23 of the 65 unique surfaces are `z_dbg_gen_*` debug dumps,
 > and 18 place part of their surface outside the reconstructed volume (all PHerc1447) — so the
 > screen's honest scope is narrower than "the GP scrolls". A vertex-vs-volume check that rejects
 > those before you spend GPU time runs in seconds at pyramid level 3, and is in the repo

@@ -2,7 +2,7 @@
 
 This section reports two whole-volume screens that both returned negative results, and treats the negatives as results. Part A (§3.1–3.5) is a dual-energy X-ray screen of PHerc.Paris.4 for heavy-metal ink, run on a Pb-K-edge-straddling energy pair (the published PHerc.0332 dual-energy null used 53/70 keV, entirely below the edge), including an explicit, referee-checked statement of what its clean null does and does not exclude. Part B (§3.6–3.11) is the full-band ink_3d screen of PHerc1203 that failed by domain shift, characterized quantitatively enough to become a fine-tune recipe and a fixed benchmark rather than a write-off.
 
-[BEN: one or two sentences in your voice on why these two screens were worth running at all — the "cheap chemistry channel nobody had signed correctly" angle for Paris 4, and the "run the released model before trusting it" angle for 1203.]
+These two screens ask questions the rest of the report cannot. The Paris 4 dual-energy pair straddles lead's K-edge, which is a cheap chemistry channel that nobody had signed correctly for lead — if metallic ink were there, it should show up without any model at all. And running the released volumetric model over PHerc1203's 2.4 µm band was the only honest way to find out whether it transfers before trusting anything it says. Both came back negative, and both negatives are worth more written down than left as an assumption.
 
 ## 3.1 Part A — why dual-energy, and the sign lesson that nearly sank it
 
@@ -70,7 +70,7 @@ The gap to Tack/Brun-level sensitivity is ≈ 5× in σ at stroke scale (need σ
 
 ## 3.6 Part B — the ink_3d full-band screen on PHerc1203: setup and the stop decision
 
-[BEN: one sentence on the decision to screen 1203's 2.4 µm band with the released Paris4-trained model — the cheap-first logic — and one on the $80 cap.]
+I ran the released model on PHerc1203's 2.4 µm band before considering anything more expensive, on the principle that you should find out what the free option does before paying for the alternative. I was working against an $80 cloud budget for the month, which is also why the gate that stopped this run at $4.46 mattered more than the run did.
 
 The screen: `scrollprize/ink_3d_dino_guided` (checkpoint v3-78k-fullsup, trained on PHerc.Paris.4), run over the PHerc1203 2.4 µm masked band in 256³ tiles (stride 256) on a six-pod RTX 5090 fleet (burn $3.49/hr). A live QC agent ran a five-control battery at ~45% coverage and returned a stop verdict; the fleet was terminated at **$4.46 of the $80 cap**, with 29,748 unique scored tiles across 14 z-slabs secured (`salvage/tiles.parquet`; the QC round itself saw the first 3,346). Full verdict: `qc_live/round1_verdict.md`.
 
@@ -124,7 +124,7 @@ The characterization converts directly into a training and acceptance recipe for
 3. **Acceptance gate before any fleet.** The five-control battery of §3.7 (pipeline equivalence, morphology vs surface prediction, tail discrimination, in-domain distribution reference, single-tile adaptation probe) runs on ~30 tiles for a few dollars. The round-1 fleet spent $4.46 to learn what this gate now detects up front; no candidate model gets fleet budget without passing it.
 4. **The before/after baseline is frozen.** `salvage/tiles.parquet` + `salvage/proxies.parquet` + `salvage/atlas_1203.npy` define the current model's behavior exactly. A successful fine-tune must (a) produce silent tiles on 1203 (the in-domain signature: 5/8 random Paris 4 blocks at f05 = 0.000 vs 0 silent tiles in 29,748 here), (b) break the density dependence (ρ(f05, meanCT) = 0.73 → near 0), and (c) fire, if at all, in stroke-shaped rather than membrane-shaped components (§3.8 census as reference). Anything less is the same failure with new weights.
 
-[BEN: if you want, close Part B with a one-sentence personal read on the "negative screen, positive methodology" framing — the QC battery + benchmark being the durable output rather than the screen itself.]
+The screen found nothing, and I think the frozen benchmark and the hard-negative recipe it produced will outlast the screen itself — which is not the outcome I wanted, but it is the useful one.
 
 ---
 
