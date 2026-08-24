@@ -72,3 +72,8 @@ Thumbs.db
 report/FACTCHECK_VERDICT.json
 GROUND_TRUTH_AUDIT.json
 issue_drafts/
+
+# xacq per-pair maps/pairs: ~1 GB of regenerable PNG/JSON products (rebuild:
+# trackD/xacq_score.py over D:/vesuvius-data/trackD/xacq_maps). Summary JSONs stay tracked.
+out/xacq/maps/
+out/xacq/pairs/
