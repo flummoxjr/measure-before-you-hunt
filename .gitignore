@@ -77,3 +77,6 @@ issue_drafts/
 # trackD/xacq_score.py over D:/vesuvius-data/trackD/xacq_maps). Summary JSONs stay tracked.
 out/xacq/maps/
 out/xacq/pairs/
+
+# Delivery tarballs / prebuilt binaries: >100MB, regenerable or release-asset-bound
+hunt/pherc0358_first_surfaces/*.tgz
