@@ -40,7 +40,7 @@ Ben to post in his own voice — short, useful, no marketing.
 > **(a) Scan quality is not the axis that predicts segmentability.** I added a sheet-separability
 > measure (local structure-tensor planarity: high where lamellae are distinct and parallel, low in
 > granular incrustation, and invariant to contrast so it can't just restate SNR). It correlates only
-> ρ = +0.34 (p = 0.24) with the SNR index. The validation I did not tune for: **PHerc0139, the one
+> ρ = +0.27 (p = 0.36) with the SNR index. The validation I did not tune for: **PHerc0139, the one
 > scroll with letters proven at 9 µm, ranks first of 14** on it, against a measured isotropic floor
 > of 0.105 from 28 in-scan air windows. And the inversion that matters to this community —
 > **PHerc1447 is the worst-scanning volume in the whole index and has more published segments than
@@ -50,14 +50,14 @@ Ben to post in his own voice — short, useful, no marketing.
 > **(b) My own ROI rule was sampling the wrong material.** The index picks each scroll's *highest
 > mean intensity* windows subject to a fill gate. In a carbonised scroll that upper tail is mineral
 > incrustation, not papyrus. Re-sampling the identical frame uniformly at random instead scores
-> **2.95× higher on separability, in 14 of 14 scrolls** — the intensity-picked windows sit barely
+> **3.0× higher on separability, in 14 of 14 scrolls** — the intensity-picked windows sit barely
 > above the isotropic floor. The tier split and the campaign correlation survive (every scroll is
 > biased the same way), but **no individual ROI number in my index describes that scroll's typical
 > material**, and I did not say so originally. If you run anything that scores "the densest window"
 > in these volumes, this will bite you too.
 >
-> Code + per-scroll JSON + figure: [BEN: repo link]. The separability output includes **per-ROI
-> coordinates and scores for all 168 sampled cubes**, so you can seed growth at material measured
+> Code + per-scroll JSON + figure: https://github.com/flummoxjr/gp13-ink-detectability. The separability output includes **per-ROI
+> coordinates and scores for all 328 sampled cubes**, so you can seed growth at material measured
 > to be laminated rather than wherever a picker lands. Happy to run it on any volume you care about.
 
 ---
@@ -85,14 +85,15 @@ Ben to post in his own voice — short, useful, no marketing.
 >    at 60°.** I wrote it because 8 surfaces I grew on PHerc0813 looked completely healthy — right area, full
 >    vertex validity, non-zero surface DN, sensible generation counts — and were sitting at a median **68.1°
 >    to the lamellae**, i.e. indistinguishable from randomly oriented. I do not yet know why. The obvious
->    candidate — that I omitted a structure-tensor direction field — is refuted: published meshes grown without one
->    sit at a median 11.3°, four of them inside 11°. Curvature averaging is excluded too (measuring only the vertices
->    inside the sampled cube makes it slightly worse, 72.9°). **If you grow surfaces, check this before you spend GPU
+>    fix is refuted by experiment: I re-grew the same seeds with the released normal grids supplied and it
+>    changed nothing (median |n_z| 0.97 before, 0.99 after; published meshes sit at 0.22). Curvature
+>    averaging is excluded too — measuring only the vertices inside the sampled cube makes it slightly
+>    worse (72.9°). **If you grow surfaces, check this before you spend GPU
 >    time rendering them** — a surface oblique to the sheets averages away exactly the depth contrast an ink model
 >    needs, and it passes every other health check. If anyone knows what makes `vc_grow_seg_from_seed` track or not
 >    track lamellae, I would genuinely like to hear it.
 >
-> All three are checkpoint-agnostic. [BEN: repo link]
+> All three are checkpoint-agnostic. https://github.com/flummoxjr/gp13-ink-detectability
 >
 > Also released: a tifxyz → 21-slice surface-volume renderer that makes the flat-mode `ink_9um`
 > checkpoints runnable on **any** 9 µm segment (validated end-to-end: re-rendering w035 from its
@@ -101,7 +102,7 @@ Ben to post in his own voice — short, useful, no marketing.
 
 ---
 
-## Post 3 — the corpus screen [BEN: survey is finished; numbers below are filled in. Check the tone still reads as an offer rather than an announcement.]
+## Post 3 — the corpus screen
 
 > **Ran the `ink_9um` instrument over every published segment of the GP scrolls**
 >

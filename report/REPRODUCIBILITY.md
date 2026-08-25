@@ -163,7 +163,7 @@ vesuvius==0.2.4
 
 ### D.2 Villa environment (`.venv314`, Python 3.14.7)
 
-Used for `vesuvius.predict` / villa inference paths on Windows. Key pins: numpy 2.5.2, scipy 1.18.0, **zarr 3.3.0**, fsspec/s3fs 2026.7.0, torch 2.11.0+cu128, torchvision 0.26.0, huggingface-hub 1.27.0, tensorstore 0.1.85, tifffile 2026.8.16, plus `villa/vesuvius` as an editable checkout. [BEN: pin the exact villa commit hash used for the shipped runs at packaging time — Track B file:line claims were verified at `origin/main 465cab06`, but the inference runs tracked main across two days.] Windows caveat: set `TORCH_COMPILE_DISABLE=1` for inference (no triton on Windows wheels; see villa PRs #1480/#1492).
+Used for `vesuvius.predict` / villa inference paths on Windows. Key pins: numpy 2.5.2, scipy 1.18.0, **zarr 3.3.0**, fsspec/s3fs 2026.7.0, torch 2.11.0+cu128, torchvision 0.26.0, huggingface-hub 1.27.0, tensorstore 0.1.85, tifffile 2026.8.16, plus `villa/vesuvius` as an editable checkout. Villa code pins for this report: every file:line claim was verified at `origin/main 465cab06` (2026-08-16) and re-verified at `97621bcf` (2026-08-20); pod inference runs cloned main `--depth 1` on their run dates (2026-08-16 → 08-21) and are not commit-pinned in the scripts, so those two hashes are the reference commits for any line-number claim. Windows caveat: set `TORCH_COMPILE_DISABLE=1` for inference (no triton on Windows wheels; see villa PRs #1480/#1492).
 
 ### D.3 Cloud pod recipe (validated; `runpod/provision.sh`, idle variant `runpod/provision_idle.sh`)
 
@@ -208,7 +208,7 @@ Excluded on purpose: `volume-cartographer`, `cucim` (manylinux-only; see villa P
 
 ## F. Suggested repository layout
 
-Repository root = the current `trackD/` working tree, pruned of large binaries. Suggested name: `gp13-ink-detectability`. [BEN: confirm repo name and whether it lives under your GitHub account.]
+Repository root = the current `trackD/` working tree, pruned of large binaries. Suggested name: `gp13-ink-detectability`. Repository: `https://github.com/flummoxjr/gp13-ink-detectability` (created 2026-08-24; private until submission, public at submission time).
 
 ```
 gp13-ink-detectability/
@@ -230,14 +230,14 @@ gp13-ink-detectability/
 └── LOG.md                     # the unedited running log (recommended: ship it — it is the provenance trail)
 ```
 
-Packaging rules: keep every `.json`, `.md`, `.png` under `out/`, `qc*/`, `salvage/`, `comb/`; exclude `*.npy`/`*.npz`/`*.parquet` caches above ~5 MB (all regenerable; `salvage/tiles.parquet` at full resolution is the one debatable keeper — [BEN: decide; it is the cross-reference layer future detectors would want]). Exclude `runpod/fleet.json` and anything containing pod IDs; the RunPod API key lives outside the tree (`.runpod_key`, gitignored) and must never ship.
+Packaging rules: keep every `.json`, `.md`, `.png` under `out/`, `qc*/`, `salvage/`, `comb/`; exclude `*.npy`/`*.npz`/`*.parquet` caches above ~5 MB (all regenerable; `salvage/tiles.parquet` at full resolution is the one debatable keeper — decision: ship it — it is the frozen benchmark any 1203-adapted model must beat, and the cross-reference layer future detectors will want). Exclude `runpod/fleet.json` and anything containing pod IDs; the RunPod API key lives outside the tree (`.runpod_key`, gitignored) and must never ship.
 
 ---
 
 ## G. Licensing and data-use notes
 
-- **Code: MIT.** The prize rules require submissions to be open-source; MIT is the project's choice for all scripts and report text in this repository. [BEN: confirm MIT vs. another OSI license on the submission form — the form asks you to name it.]
-- **Scroll data: Vesuvius Challenge terms, non-commercial.** All CT volumes, segments, labels, and released predictions are distributed by the Vesuvius Challenge under its data agreement (CC BY-NC 4.0 non-commercial terms at last check, accepted programmatically via `vesuvius.accept_terms`). This repository redistributes **no** bulk scroll data — only URLs, small derived JSON statistics, and report figures. Derived rasters and figures that visually reproduce scan content (overlay PNGs, galleries) inherit the non-commercial restriction and are marked as data-derived in `DATA_LICENSE.md`. [BEN: re-verify the current license text at scrollprize.org/data before submitting; the CC BY-NC characterization is from our acceptance flow, not a legal review.]
+- **Code: MIT.** The prize rules require submissions to be open-source; MIT is the project's choice for all scripts and report text in this repository. Named on the submission form as: MIT.
+- **Scroll data: Vesuvius Challenge terms, non-commercial.** All CT volumes, segments, labels, and released predictions are distributed by the Vesuvius Challenge under its data agreement (CC BY-NC 4.0 non-commercial terms at last check, accepted programmatically via `vesuvius.accept_terms`). This repository redistributes **no** bulk scroll data — only URLs, small derived JSON statistics, and report figures. Derived rasters and figures that visually reproduce scan content (overlay PNGs, galleries) inherit the non-commercial restriction and are marked as data-derived in `DATA_LICENSE.md`. The CC BY-NC characterization comes from the data-acceptance flow, not a legal review; the current text at scrollprize.org/data is the authority at submission time.
 - **Model checkpoints** (`scrollprize/ink_9um`, `scrollprize/ink_3d_dino_guided`) are used unmodified under their Hugging Face repo terms; no weights are redistributed here.
 - **Attribution.** Data: Vesuvius Challenge / EduceLab and the ESRF (BM18 beamline scans). Literature values used in the K3 bound: Tack et al. 2016 (Sci. Rep. 6:20763) and Brun et al. 2016 (PNAS 113:3751); attenuation coefficients from NIST/XCOM. Villa/vesuvius tooling: ScrollPrize/villa (our upstream fixes are listed in the main report).
 
@@ -245,14 +245,14 @@ Packaging rules: keep every `.json`, `.md`, `.png` under `out/`, `qc*/`, `salvag
 
 ## H. Submission form fields
 
-[BEN: the Google Form at scrollprize.org/prizes requires these — all need your voice/decision:]
+The Google Form at scrollprize.org/prizes asks for the following; the values are filled in below.
 
-- Submitter: Ben Black — benblack211@gmail.com — GitHub `flummoxjr`. **[BEN: you still need to join the Discord; add the handle.]**
+- Submitter: Ben Black — benblack211@gmail.com — GitHub `flummoxjr`. Discord handle to be entered directly on the form.
 - Category: Monthly Progress Prize. Deadline 31 August 2026, 11:59 pm Pacific.
-- Submission description: "A per-scroll detectability index for the thirteen Grand-Prize scrolls on two near-orthogonal axes (scan quality and sheet separability), an ink instrument validated against human-verified letters at AUC 0.999, a screen of every published Grand-Prize segment with that instrument (80/80 rows, 0 of 71 passing a five-gate protocol the control passes 5/5), two whole-volume screens, and three reusable QC gates. No ink was found and none is claimed. Sixteen corrections are published as a ledger, five of them against results inside the report." [BEN: trim to whatever length the form allows — quantified transfer-failure characterization of ink_3d on PHerc1203 + the adversarial-QC methodology (2 false positives and 3 method errors caught pre-publication) + upstream tool fixes (PRs #1479/#1480/#1487/#1492, issues #1488–#1490).]
-- [BEN: repository URL (public before submission) + license name.]
+- Submission description: "A per-scroll detectability index for the thirteen Grand-Prize scrolls on two near-orthogonal axes (scan quality and sheet separability), an ink instrument validated against human-verified letters at AUC 0.999, a screen of every published Grand-Prize segment with that instrument (80/80 rows, 0 of 71 passing a five-gate protocol the control passes 5/5), two whole-volume screens, and three reusable QC gates. No ink was found and none is claimed. Sixteen corrections are published as a ledger, five of them against results inside the report." A longer variant, if the form allows: append "Also included: a quantified transfer-failure characterization of ink_3d on PHerc1203 with a fine-tune recipe, and upstream tool fixes (merged PR #1480; open PRs #1479/#1487/#1492; issues #1488–#1490, #1520, #1524–#1525)."
+- Repository URL: `https://github.com/flummoxjr/gp13-ink-detectability` (public at submission). License: MIT.
 - Link `LOG.md` as the provenance trail. It is unflattering in places and that is the point: it shows the order things were actually found in, including the wrong turns.
-- [BEN: any claim wording. House rule carried through this report: model detections are never called "letters" or "ink" unless human-verified; the only human-verified letters anywhere in this work are the w035 labels.]
+- Claim wording on the form follows the house rule carried through this report: model detections are never called "letters" or "ink" unless human-verified; the only human-verified letters anywhere in this work are the w035 labels.
 
 ---
 
@@ -262,8 +262,8 @@ Packaging rules: keep every `.json`, `.md`, `.png` under `out/`, `qc*/`, `salvag
 2. **The fleet screen covers ~30k of a projected ~169k tiles** (stopped at ~45% by the QC verdict, deliberately). The banked negative and all per-tile statistics apply to the covered z-slabs, not the full band.
 3. **PHerc0139's K2b noise reference is a papyrus-residual floor**, not air (no candidate air window passed validation); its bandwidth/SNR are conservative. PHerc0800's air came from the fallback full-z search. Both are flagged in the per-scroll JSONs (`noise_ref` field).
 4. **One PHerc1203 segment fails to render** (`auto_grown_20251005221856743`), cause undiagnosed; excluded from the ink_9um probe. Villa's `volume_io` zarr-3 disk-cache `ContextVar` error (worked around with no-cache) is reported but uninvestigated.
-5. **Windows-specific paths**: scripts cache to `D:\vesuvius-data\trackD\` and reference `C:\...\trackD\out`; a re-runner on another machine must adjust two path constants per script (they are top-of-file). [BEN: acceptable for a report repo, or want a pass to env-var these before release?]
-6. **The exact villa commit for the pod runs is not pinned in the scripts** (clone `--depth 1` of main at run time); §D.2's [BEN] item covers pinning it retroactively in the README.
+5. **Windows-specific paths**: scripts cache to `D:\vesuvius-data\trackD\` and reference `C:\...\trackD\out`; a re-runner on another machine must adjust two path constants per script (they are top-of-file). Accepted as-is for a report repository — both constants are top-of-file and documented here.
+6. **The exact villa commit for the pod runs is not pinned in the scripts** (clone `--depth 1` of main at run time); the reference hashes in §D.2 (`465cab06`, `97621bcf`) are the pins for all line-number claims.
 7. **S1a v1/v2 outputs are retained but refuted** — any reproduction will faithfully reproduce numbers that the verification reports show measure artifacts. The scripts stay for the methodological record; the reports (`qc/s1a_verification.md`, `qc/s1a_v2_verification.md`) are the citable objects.
 8. **uint8 saturation censoring** (8/14 scrolls, 5–34% of in-mask voxels) right-censors the K2b DN-headroom metric and any bright-ink screen on those scrolls; documented in §4.5 and `comb/COMB_VERDICT.md` flag 7.
 9. **K3's beam spectra are nominal**: the 74/110 keV predictions carry ±10% systematics (pink beam, inconsistent filtration metadata), and a ~8–10% papyrus-ratio discrepancy remains unexplained after offset correction. All K3 sensitivity numbers are quoted per calibration frame for this reason.

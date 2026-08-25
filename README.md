@@ -5,8 +5,11 @@ screen of the published Grand-Prize scroll segments.**
 
 Vesuvius Challenge submission, August 2026 · [scrollprize.org](https://scrollprize.org)
 
-> [BEN: 2–4 sentences in your own voice — who you are, that this is your first month in the
-> challenge, and the AI-assistance disclosure. This is the first thing a judge reads.]
+I'm Ben Black, and this is my first month on the Vesuvius Challenge. This repository is one
+question, measured: before you spend compute hunting ink in an unread scroll, can you tell whether
+reading it is even possible? I did not find ink, and the report says so throughout. AI agents were
+used in this work, under my direction; I set the questions, made the judgment calls, and checked
+the numbers.
 
 ---
 
@@ -16,7 +19,7 @@ Before spending compute hunting ink in an unread scroll, measure whether its rel
 model are in the class where reading is even possible. Nobody had published that measurement. This
 repository is that measurement, plus the acceptance gates that keep it honest.
 
-**Total cloud compute for everything here: ≈ $11.**
+**Total cloud compute: ≈ $20 all-in — the report itemises it, waste included.**
 
 ## What it found
 
@@ -44,9 +47,9 @@ detail; neither is a detection.
 
 ## The part that is easiest to check, and the point of the whole thing
 
-Fifteen corrections are published as a ledger in [`report/sections/04_methodology.md`](report/sections/04_methodology.md),
-four of them against results in this very report. Among them: our own newly grown PHerc0813
-surfaces turned out to sit at a median **67.3° to the sheets they were meant to follow**, so the ink
+Sixteen corrections are published as a ledger in [`report/sections/04_methodology.md`](report/sections/04_methodology.md),
+five of them against results in this very report. Among them: our own newly grown PHerc0813
+surfaces turned out to sit at a median **68.1° to the sheets they were meant to follow**, so the ink
 test planned for them was **withdrawn rather than reported**.
 
 ## Layout
@@ -72,7 +75,7 @@ Environment pins, public data URLs and per-figure regeneration commands are in
 no bulk download is required.
 
 ```bash
-python report/scripts/verify_report.py    # 15 checks against primary artifacts
+python report/scripts/verify_report.py    # 18 checks against primary artifacts
 ```
 
 ## What is not in this repository

@@ -194,10 +194,7 @@ k2c = json.load(open(os.path.join(T, "out", "k2c_separability", "k2c_analysis.js
 sc = k2c["scrolls"]
 if len(sc) != 14:
     problems.append(f"K2C COVERAGE: report 14 scrolls vs {len(sc)}")
-expect_sep = {"PHerc0139": 0.748, "PHerc0358": 0.713, "PHerc0813": 0.665, "PHerc0826": 0.634,
-              "PHerc1447": 0.605, "PHerc1203": 0.570, "PHerc0800": 0.563, "PHerc1545": 0.541,
-              "PHerc0211": 0.530, "PHerc0191": 0.506, "PHerc0125": 0.415, "PHerc1218": 0.389,
-              "PHerc0257": 0.374, "PHerc0268": 0.337}
+expect_sep = {"PHerc0139": 0.744, "PHerc0358": 0.713, "PHerc0813": 0.662, "PHerc0826": 0.640, "PHerc1447": 0.610, "PHerc0800": 0.563, "PHerc1203": 0.555, "PHerc1545": 0.549, "PHerc0211": 0.543, "PHerc1218": 0.526, "PHerc0191": 0.525, "PHerc0125": 0.424, "PHerc0257": 0.385, "PHerc0268": 0.317}
 for k, v in expect_sep.items():
     got = sc.get(k, {}).get("sep_med")
     if got is None or abs(got - v) > 0.0006:
@@ -206,12 +203,12 @@ for k, v in expect_sep.items():
 rank = sorted(sc, key=lambda k: -sc[k]["sep_med"])
 if rank[0] != "PHerc0139":
     problems.append(f"SEPARABILITY ANCHOR: report PHerc0139 ranks 1st vs {rank[0]}")
-if abs(k2c["sep_vs_snr_spearman"]["rho"] - 0.336) > 0.002:
-    problems.append(f"SEP-vs-SNR rho: report +0.336 vs {k2c['sep_vs_snr_spearman']['rho']:+.3f}")
+if abs(k2c["sep_vs_snr_spearman"]["rho"] - 0.266) > 0.002:
+    problems.append(f"SEP-vs-SNR rho: report +0.266 vs {k2c['sep_vs_snr_spearman']['rho']:+.3f}")
 pb = k2c["picker_bias"]
-if (pb["n_scrolls_random_higher"] != 14 or abs(pb["median_ratio"] - 2.95) > 0.02
+if (pb["n_scrolls_random_higher"] != 14 or abs(pb["median_ratio"] - 3.00) > 0.02
         or pb["mannwhitney_p"] > 1e-20):
-    problems.append(f"PICKER BIAS: report 14/14, 2.95x, p=5.4e-25 vs "
+    problems.append(f"PICKER BIAS: report 14/14, 3.00x, p<1e-20 vs "
                     f"{pb['n_scrolls_random_higher']}/14, {pb['median_ratio']:.2f}x, p={pb['mannwhitney_p']:.2g}")
 if abs(pb["random_med"] - 0.564) > 0.002 or abs(pb["picked_med"] - 0.168) > 0.002:
     problems.append(f"PICKER BIAS MEDIANS: report 0.564 / 0.168 vs "
@@ -254,6 +251,29 @@ if abs(al["median_angle_deg"] - 68.1) > 0.1 or al["n_within_30deg"] != 0 or len(
 if abs(pu["median_angle_deg"] - 13.1) > 0.1 or pu["n_within_30deg"] != 7 or len(pu["meshes"]) != 9:
     problems.append(f"PUBLISHED ALIGNMENT: report 9 meshes, 13.1 deg, 7 within 30 vs "
                     f"{len(pu['meshes'])}, {pu['median_angle_deg']:.1f}, {pu['n_within_30deg']}")
+mt = json.load(open(os.path.join(T, "out", "k2c_separability", "modetest_nz.json")))
+import statistics as _stt
+rv = list(mt["R_random_seed"].values()); ev = list(mt["E_explicit_seed"].values())
+if (len(rv) != 8 or len(ev) != 8 or abs(_stt.median(rv) - 0.979) > 0.01
+        or abs(_stt.median(ev) - 0.989) > 0.01 or min(rv + ev) <= 0.7):
+    problems.append(f"MODETEST: report 8+8, medians 0.979/0.989, 16/16 > 0.7 vs "
+                    f"{len(rv)}+{len(ev)}, {_stt.median(rv):.3f}/{_stt.median(ev):.3f}, min {min(rv+ev):.3f}")
+checks.append(f"mode A/B: random_seed {_stt.median(rv):.3f} vs explicit {_stt.median(ev):.3f}, "
+              f"16/16 flat — seeding exonerated")
+
+cal = json.load(open(os.path.join(T, "out", "k2c_separability", "corpus_alignment_local.json")))
+cs = cal["summary"]
+if (cs["n_locally_measured"] != 35 or abs(cs["median_local_deg"] - 5.47) > 0.05
+        or cs["n_local_ge_45"] != 5):
+    problems.append(f"LOCAL ALIGNMENT: report 35 measured / median 5.5 / 5 at >=45 vs "
+                    f"{cs['n_locally_measured']} / {cs['median_local_deg']:.1f} / {cs['n_local_ge_45']}")
+exon = [r for r in cal["segments"] if r.get("status") == "ok"
+        and r["angle_global_deg"] >= 45 and r["angle_local_deg"] < 45]
+if len(exon) != 1 or exon[0]["scroll"] != "PHerc1203":
+    problems.append(f"LOCAL ALIGNMENT EXONERATION: report 1 (PHerc1203) vs {[(r['scroll']) for r in exon]}")
+checks.append(f"local alignment recompute: {cs['n_locally_measured']} measured, median "
+              f"{cs['median_local_deg']:.1f} deg, 5 confirmed >=45, 1 exonerated (PHerc1203)")
+
 checks.append(f"PHerc0813 mesh alignment: ours {al['median_angle_deg']:.1f}° ({al['n_within_30deg']}/8 "
               f"within 30°) vs published {pu['median_angle_deg']:.1f}° ({pu['n_within_30deg']}/9)")
 
@@ -295,6 +315,29 @@ if sum(1 for r in meas if r["angle_deg"] >= 45) != 19:
 checks.append(f"corpus alignment audit: {len(meas)}/80 measured, median "
               f"{_st.median([r['angle_deg'] for r in meas]):.1f} deg, "
               f"dumps {_st.median(dbg):.1f} vs curated {_st.median(cur):.1f}")
+
+
+# --- addendum checks (A1-A4) ---
+import json as _j
+from pathlib import Path as _P
+_TD = _P(R).parent
+_g = _j.dumps(_j.load(open(_TD/'out'/'g1v2'/'G1V2_RESULTS.json', encoding='utf-8')))
+for _needle in ('0.5775', '0.6907', '1.806'):
+    if _needle not in _g: problems.append(f"ADDENDUM A1: {_needle} not in G1V2_RESULTS.json")
+checks.append("addendum A1: ceiling 0.578/0.691 vox-equiv, max z 1.81 in g1v2 artifact")
+_x = open(_TD/'out'/'xacq'/'corpus_summary.json', encoding='utf-8').read()
+_c = open(_TD/'out'/'xacq'/'calibration_rows.json', encoding='utf-8').read()
+if '25.09' not in _x and '25.1' not in _x: problems.append("ADDENDUM A3: L99 median 25.09 not in corpus_summary.json")
+if '0.008' not in (_x + _c): problems.append("ADDENDUM A3: median gain 0.0080 not in xacq artifacts")
+checks.append("addendum A3: L99 median ~25 and gain ~0.0080 in xacq artifacts")
+_b = _j.load(open(_TD/'out'/'curve_audit'/'expA_baseline.json', encoding='utf-8'))
+if abs(_b['auc_forward']-0.6925)>0.0005 or abs(_b['auc_reverse']-0.4477)>0.0005 or _b['gate_passed'] is not False:
+    problems.append("ADDENDUM A4: expA_baseline.json does not match 0.6925/0.4477/gate-failed")
+checks.append("addendum A4: fragment transfer 0.6925/0.4477, gate failed")
+_n = open(_TD/'out'/'null_scaling'/'NULL_SCALING.md', encoding='utf-8').read()
+for _needle in ('566', '2755'):
+    if _needle not in _n: problems.append(f"ADDENDUM A2: {_needle} not in NULL_SCALING.md")
+checks.append("addendum A2: n_eff 566 and sd 2755 in null-scaling writeup")
 
 print("CHECKS RUN:")
 for c in checks:
