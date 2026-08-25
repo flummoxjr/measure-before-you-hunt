@@ -3,10 +3,7 @@
 **A scan-quality index, a sheet-separability axis, a validated ink instrument, and a corpus-wide
 screen of the published Grand-Prize scroll segments.**
 
-Vesuvius Challenge submission, August 2026 · **this is the canonical repository** (the URL on the submitted
-prize form). A content mirror lives at
-[gp13-ink-detectability](https://github.com/flummoxjr/gp13-ink-detectability), which also hosts the
-prebuilt tracer binary as a release asset. · [scrollprize.org](https://scrollprize.org)
+Vesuvius Challenge submission, August 2026 · This repository and [gp13-ink-detectability](https://github.com/flummoxjr/gp13-ink-detectability) are **content-identical mirrors**; gp13 also hosts the prebuilt tracer binary as a release asset. Both stay public through judging. · [scrollprize.org](https://scrollprize.org)
 
 I'm Ben Black, and this is my first month on the Vesuvius Challenge. This repository is one
 question, measured: before you spend compute hunting ink in an unread scroll, can you tell whether
