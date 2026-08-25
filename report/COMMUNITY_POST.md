@@ -56,7 +56,7 @@ Ben to post in his own voice — short, useful, no marketing.
 > material**, and I did not say so originally. If you run anything that scores "the densest window"
 > in these volumes, this will bite you too.
 >
-> Code + per-scroll JSON + figure: https://github.com/flummoxjr/gp13-ink-detectability. The separability output includes **per-ROI
+> Code + per-scroll JSON + figure: https://github.com/flummoxjr/measure-before-you-hunt. The separability output includes **per-ROI
 > coordinates and scores for all 328 sampled cubes**, so you can seed growth at material measured
 > to be laminated rather than wherever a picker lands. Happy to run it on any volume you care about.
 
@@ -93,7 +93,7 @@ Ben to post in his own voice — short, useful, no marketing.
 >    needs, and it passes every other health check. If anyone knows what makes `vc_grow_seg_from_seed` track or not
 >    track lamellae, I would genuinely like to hear it.
 >
-> All three are checkpoint-agnostic. https://github.com/flummoxjr/gp13-ink-detectability
+> All three are checkpoint-agnostic. https://github.com/flummoxjr/measure-before-you-hunt
 >
 > Also released: a tifxyz → 21-slice surface-volume renderer that makes the flat-mode `ink_9um`
 > checkpoints runnable on **any** 9 µm segment (validated end-to-end: re-rendering w035 from its
