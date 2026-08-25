@@ -15,8 +15,8 @@ Individual submission — Ben Black (GitHub: flummoxjr). AI agents were used in 
 under my direction: I set the questions, made the judgment calls, and checked the numbers.
 
 **4. URL to your open source / publicly available contribution**
-https://github.com/flummoxjr/gp13-ink-detectability
-Also: merged villa PR #1480; open PRs #1479, #1487, #1492; issues #1488–#1490, #1520, #1524, #1525.
+https://github.com/flummoxjr/measure-before-you-hunt
+Also: merged villa PRs #1480 and #1479; open PRs #1487, #1492; issues #1488–#1490, #1520, #1524, #1525.
 
 **5. Short description of how your contributions substantially increase the probability of reading complete scrolls**
 Reading a scroll starts with choosing where to spend compute, and nobody had published a
