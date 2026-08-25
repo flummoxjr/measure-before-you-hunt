@@ -15,7 +15,8 @@ GQL = "https://api.runpod.io/graphql"
 REST = "https://rest.runpod.io/v1"
 HDRS = {"Authorization": f"Bearer {KEY}", "Content-Type": "application/json"}
 BASELINE_FILE = os.path.join(os.path.dirname(__file__), "balance_baseline.json")
-SOFT_STOP = 70.0
+SOFT_STOP = 150.0  # raised 2026-08-21 on Ben's instruction.
+                  # (§2.9.1). Shared $80 cap; a second session also draws on it.
 
 
 def gql(query, variables=None):
