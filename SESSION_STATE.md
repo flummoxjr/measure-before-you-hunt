@@ -50,7 +50,7 @@ and the 0358 v1 prereg is unverified until the corrected number below lands. Not
 |---|---|---|
 | Bet C corpus reconnaissance ($0) | background agent: locate + fingerprint the 2023 Scroll 1 legacy 7.91 µm labels, PHerc0172 labels, Frag5/6 7.91 µm; → `bench/betC_corpus_manifest.json` + `bench/BETC_CORPUS.md` | agent running |
 | Bet A arm 0 = LOSO baseline plan ($0 now, ~$5–8 to run) | background agent: the `koine_machines.training.train` entry point on villa merge-ink-pipelines, data layout/sizes for the 15 kept representations, cost, khj1222's anchor numbers → `bench/betA_arm0/PLAN.md` + `data_manifest.json` | agent running |
-| Geometry substrate v2 (~$0.5–1) | pod `yd7zzui374fg4i` (builder image, gist `bench/grow_v2/gist_raw_url.txt`): 24 support-gated seeds each on PHerc0813 (`hunt/seeds_0813.json`, 8 kept + 16 new) and PHerc0826 (`hunt/seeds_0826.json`), tracer vc-tracer-de3c2494 (build fallback), waves of nproc, min_area 0.3; guard → `experiments/grow_0813_0826/` (bundle.tgz = paths_0813 + paths_0826 + logs). Then `hunt/gate_patches.py --scroll … --paths … --seeds …` locally; release v1 = gate-PASS tifxyz + QC JSON | launched 03:47 UTC |
+| Geometry substrate v2 (~$0.5–1) | pod `yd7zzui374fg4i` (builder image, gist `bench/grow_v2/gist_raw_url.txt`): 24 support-gated seeds each on PHerc0813 (`hunt/seeds_0813.json`, 8 kept + 16 new) and PHerc0826 (`hunt/seeds_0826.json`), tracer vc-tracer-de3c2494 (build fallback), waves of nproc, min_area 0.3; guard → `experiments/grow_0813_0826/` (bundle.tgz = paths_0813 + paths_0826 + logs). Then `hunt/gate_patches.py --scroll … --paths … --seeds …` locally; release v1 = gate-PASS tifxyz + QC JSON | relaunched 04:19 UTC as pod `dbxycnf0fmllyk` (A6000 community, 32 vCPU, $0.33/h) after two 1–2-vCPU hosts; guard → `experiments/grow_0813_0826d/` |
 | w059 escalation (~$3–5) | Track F arm B full-coverage render from the 1.129 µm volume + same-model reverse + identical battery (`out/trackF/RESULTS_F.md`); queued after the growth pod (one pod at a time) | next |
 | xacq null re-audit ($0 local) | rerun with the sheet mask rolled with the calls (williamshermer-pixel: 14.2× vs our 25×); after the battery frees the CPU | queued |
 
@@ -81,6 +81,11 @@ and the 0358 v1 prereg is unverified until the corrected number below lands. Not
 - Both repos: `measure-before-you-hunt` (private, canonical working truth = local trackD) and
   `gp13-ink-detectability` (public, what the Aug form cited); keep trees identical.
 - `.venv` (3.12) has numpy/scipy/tifffile/PIL; anything importing `vesuvius` needs `.venv314`.
+- **Pod sizing (2026-09-02):** for CPU-bound jobs (the tracer) use `launch_pod.py --min-vcpu N --min-ram G` — it goes through GraphQL
+  `podFindAndDeployOnDemand(minVcpuCount, minMemoryInGb)`, which filters hosts; REST `minVCPUPerGPU` did not. Judge a pod by
+  `pod.vcpuCount`/`memoryInGb`, NOT `machine.cpuCount` (host-level, misleading; two pods were killed on it needlessly ~$0.05).
+  RunPod CPU-only pods (cpu3c/cpu5c…) returned 'no instances' for the builder image; untested further. An A6000 community
+  host gave 32 vCPU / 156 GB at $0.33/h.
 - `scripts/pod_guard.py` lives OUTSIDE the trackD git repo (project root is not a repo); its 2026-09-02 `--fetch-dirs/--fetch-files`
   change is on disk only. Pod scripts that write results under served subdirs need those flags or a bundle.tgz.
 - GPU laptop was busy (87%) all evening — no local runs were attempted.

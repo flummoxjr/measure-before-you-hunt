@@ -52,6 +52,8 @@ def main():
     ap.add_argument("--gpus", default="", help="comma list of 'GPU TYPE/CLOUD' attempts, e.g. 'NVIDIA GeForce RTX 4090/COMMUNITY,NVIDIA GeForce RTX 5090/COMMUNITY'")
     ap.add_argument("--min-vcpu", type=int, default=0, help="minimum vCPUs per GPU (REST minVCPUPerGPU); CPU-bound jobs need this -- a community 4090 came with 1 vCPU on 2026-09-02")
     ap.add_argument("--min-ram", type=int, default=0, help="minimum RAM GB per GPU (REST minRAMPerGPU)")
+    ap.add_argument("--cpu-flavor", default="", help="CPU-only pod: RunPod cpu flavor id (cpu3c compute $0.06/vCPU-h, cpu3g general 4 GB RAM/vCPU $0.08, cpu5c/cpu5g newer); no GPU is attached")
+    ap.add_argument("--vcpu", type=int, default=16, help="vCPU count for a CPU-only pod (2-32)")
     ap.add_argument("--dry", action="store_true")
     a = ap.parse_args()
     attempts = ATTEMPTS
@@ -71,12 +73,39 @@ def main():
         base["minVCPUPerGPU"] = a.min_vcpu
     if a.min_ram:
         base["minRAMPerGPU"] = a.min_ram
+    if a.cpu_flavor:
+        base.pop("gpuCount", None)
+        base.update(computeType="CPU", cpuFlavorIds=[a.cpu_flavor], vcpuCount=a.vcpu, cloudType="SECURE")
+        attempts = [(f"CPU {a.cpu_flavor} x{a.vcpu}", "SECURE")]
     if a.dry:
         print(json.dumps(base, indent=1))
         return
     pod = None
     for gpu, cloud in attempts:
-        r = requests.post(f"{REST}/pods", headers=H, data=json.dumps(dict(base, gpuTypeIds=[gpu], cloudType=cloud)), timeout=120)
+        if a.min_vcpu and not a.cpu_flavor:
+            # GraphQL podFindAndDeployOnDemand honours minVcpuCount/minMemoryInGb as a host
+            # filter (REST minVCPUPerGPU did not: 2026-09-02 got 1- and 2-vCPU hosts).
+            q = ("mutation ($in: PodFindAndDeployOnDemandInput) { podFindAndDeployOnDemand(input: $in) "
+                 "{ id costPerHr machine { podHostId } } }")
+            v = {"in": {"cloudType": cloud, "gpuCount": 1, "gpuTypeId": gpu, "minVcpuCount": a.min_vcpu,
+                        "minMemoryInGb": a.min_ram or 16, "containerDiskInGb": a.disk, "volumeInGb": 0,
+                        "imageName": a.image, "dockerArgs": "bash -c " + json.dumps(boot),
+                        "ports": "8000/http,22/tcp", "name": a.name, "supportPublicIp": True,
+                        "env": [{"key": "PYTHONUNBUFFERED", "value": "1"}]}}
+            try:
+                d = gql(q, v)["podFindAndDeployOnDemand"]
+            except Exception as e:
+                print(f"{gpu}/{cloud} (gql minVcpu={a.min_vcpu}): {str(e)[:220]}")
+                time.sleep(5)
+                continue
+            if not d:
+                print(f"{gpu}/{cloud} (gql): no host")
+                continue
+            pod = d
+            print(f"CREATED (gql, minVcpu={a.min_vcpu}) {gpu}/{cloud}: id={pod.get('id')} costPerHr={pod.get('costPerHr')}")
+            break
+        body = dict(base) if a.cpu_flavor else dict(base, gpuTypeIds=[gpu], cloudType=cloud)
+        r = requests.post(f"{REST}/pods", headers=H, data=json.dumps(body), timeout=120)
         if r.status_code >= 300:
             print(f"{gpu}/{cloud}: HTTP {r.status_code} {r.text[:200]}")
             time.sleep(5)
