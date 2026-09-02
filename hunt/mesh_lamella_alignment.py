@@ -29,18 +29,31 @@ SEEDCACHE = r"D:\vesuvius-data\trackD\k2c_seeds"
 
 
 def mesh_normal(d):
-    """Median unit normal of a tifxyz patch, from grid tangent cross-products."""
+    """Median unit normal of a tifxyz patch, from grid tangent cross-products.
+
+    NOTE: tifxyz marks invalid vertices with **-1**, not 0. An earlier version of
+    this function masked on (x==0)&(y==0)&(z==0), which never matched anything, so
+    -1 sentinels were treated as real coordinates. Their gradients at the
+    valid/invalid boundary are enormous and dominate the orientation tensor. The
+    published GP meshes are 47-52% invalid and ours are ~4%, so that bug biased the
+    two populations by very different amounts. Mask on sign, and require a vertex's
+    central-difference neighbours to be valid too (erode by one).
+    """
     x = tifffile.imread(os.path.join(d, "x.tif")).astype(np.float64)
     y = tifffile.imread(os.path.join(d, "y.tif")).astype(np.float64)
     z = tifffile.imread(os.path.join(d, "z.tif")).astype(np.float64)
-    valid = ~((x == 0) & (y == 0) & (z == 0))
-    # tangents along the two grid axes
+    valid = (x >= 0) & (y >= 0) & (z >= 0) & ~((x == 0) & (y == 0) & (z == 0))
+    # a central difference at p needs p's 4-neighbours; erode so only interior
+    # vertices of valid regions contribute
+    core = ndi.binary_erosion(valid, structure=np.ones((3, 3), bool), border_value=0)
+    if core.sum() < 50:
+        return None, 0
     tu = np.stack([np.gradient(a, axis=0) for a in (z, y, x)], -1)
     tv = np.stack([np.gradient(a, axis=1) for a in (z, y, x)], -1)
     n = np.cross(tu, tv)
-    ok = valid & (np.linalg.norm(n, axis=-1) > 1e-6)
+    ok = core & (np.linalg.norm(n, axis=-1) > 1e-6)
     if ok.sum() < 50:
-        return None, 0
+        return None, int(core.sum())
     nn = n[ok]
     nn = nn / np.linalg.norm(nn, axis=-1, keepdims=True)
     # axial average (sign of a normal is arbitrary): leading eigenvector of the

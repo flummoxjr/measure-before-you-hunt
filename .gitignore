@@ -7,6 +7,8 @@ runpod/grow_pod.json
 runpod/probe_pod.json
 runpod/survey_fleet.json
 runpod/balance_baseline.json
+runpod/grow_pod_ngrid.json
+out/podwatch/
 qc_live/round_1/manifest.json
 
 # Anything that looks like a credential, belt and braces.
@@ -83,3 +85,11 @@ hunt/pherc0358_first_surfaces/*.tgz
 
 # The 0358 first-geometry payload is a deliberate exception to the *.tif rule
 !hunt/pherc0358_first_surfaces/paths_0358/**/*.tif
+
+# agent working records, not results
+CAMPAIGN_RECON.json
+DIVERGENT_ATTACKS.json
+G1_RESULTS.json
+METROLOGY_BLOCK1.json
+ZROLL_PREP.json
+NUL

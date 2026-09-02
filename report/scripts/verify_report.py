@@ -3,8 +3,8 @@ import json
 import os
 import re
 
-R = r"C:\Users\benbl\Desktop\Vsuvious\trackD\report"
-T = r"C:\Users\benbl\Desktop\Vsuvious\trackD"
+R = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+T = os.path.dirname(R)
 problems, checks = [], []
 
 # --- 1. figure links resolve from each file's own directory
@@ -251,6 +251,13 @@ if abs(al["median_angle_deg"] - 68.1) > 0.1 or al["n_within_30deg"] != 0 or len(
 if abs(pu["median_angle_deg"] - 13.1) > 0.1 or pu["n_within_30deg"] != 7 or len(pu["meshes"]) != 9:
     problems.append(f"PUBLISHED ALIGNMENT: report 9 meshes, 13.1 deg, 7 within 30 vs "
                     f"{len(pu['meshes'])}, {pu['median_angle_deg']:.1f}, {pu['n_within_30deg']}")
+mb = json.load(open(os.path.join(T, "out", "k2c_separability", "mainbuild_nz.json")))["mainbuild_abs_nz"]
+import statistics as _stb
+if len(mb) != 8 or abs(_stb.median(list(mb.values())) - 0.236) > 0.01 or max(mb.values()) > 0.7:
+    problems.append(f"MAINBUILD: report 8 meshes, median 0.236, 0 flat vs "
+                    f"{len(mb)}, {_stb.median(list(mb.values())):.3f}, max {max(mb.values()):.3f}")
+checks.append(f"current-build re-grow: |n_z| median {_stb.median(list(mb.values())):.3f} (published 0.223) — cause resolved: stale image")
+
 mt = json.load(open(os.path.join(T, "out", "k2c_separability", "modetest_nz.json")))
 import statistics as _stt
 rv = list(mt["R_random_seed"].values()); ev = list(mt["E_explicit_seed"].values())

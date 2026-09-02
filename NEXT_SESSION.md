@@ -126,8 +126,7 @@ One binary explained all five symptoms. Artifacts: `out/k2c_separability/mainbui
 meshes `hunt/pherc0813_mainbuild/`. Posted to #1588 + #191.
 **OPERATIONAL:** the built binary died with the pod — next growth run rebuilds in ~8 min on a builder image (my earlier 5 h figure was a local-vs-UTC
 timestamp misread) — still tar the binary home for reuse. **NEVER use `:edge`/`:main` images until republished.**
-**UNBLOCKED NEXT: PHerc0358 first surfaces** — source-build tracer, seed from the high-separability ROI
-coordinates in `out/k2c_separability/PHerc0358.json`, then render + ink_9um + the battery.
+**DONE 2026-08-25: PHerc0358 FIRST SURFACES — 8 patches, ≈69 cm², 8/8 PASS the alignment gate** (local angles 3.6–18.6°, |n_z| 0.005–0.351, areas 8.41–9.12 cm², all seeds read 255). Grown with the current-main tracer from this axis's own top ROIs; gate artifact `hunt/pherc0358_first_surfaces/alignment_gate.json`. **Render + ink_9um + battery is the OTHER SESSION'S lane (agreed split)** — results land in out/. Reusable tracer published: github.com/flummoxjr/gp13-ink-detectability/releases/tag/vc-tracer-de3c2494 (159 MB, skips all future builds). Gate lesson: use the LOCALLY-RESTRICTED angle (corpus_alignment_local.local_normal) — the global measure read 33–75° on these healthy curved sheets.
 Track B same day: #1479 MERGED 08-22 (second merge); Bullo27 byte-identically verified #1586/#1587 on
 zarr 3.2.1; spread recorded on zarr#4282.**
 
