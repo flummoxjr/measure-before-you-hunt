@@ -50,6 +50,8 @@ def main():
     ap.add_argument("--image", default=IMAGE, help="container image (default: runpod pytorch)")
     ap.add_argument("--pre", default="", help="shell snippet run before curl (e.g. apt-get install curl python3 on images without them)")
     ap.add_argument("--gpus", default="", help="comma list of 'GPU TYPE/CLOUD' attempts, e.g. 'NVIDIA GeForce RTX 4090/COMMUNITY,NVIDIA GeForce RTX 5090/COMMUNITY'")
+    ap.add_argument("--min-vcpu", type=int, default=0, help="minimum vCPUs per GPU (REST minVCPUPerGPU); CPU-bound jobs need this -- a community 4090 came with 1 vCPU on 2026-09-02")
+    ap.add_argument("--min-ram", type=int, default=0, help="minimum RAM GB per GPU (REST minRAMPerGPU)")
     ap.add_argument("--dry", action="store_true")
     a = ap.parse_args()
     attempts = ATTEMPTS
@@ -65,6 +67,10 @@ def main():
     base = {"name": a.name, "imageName": a.image, "gpuCount": 1, "containerDiskInGb": a.disk,
             "volumeInGb": 0, "ports": ["8000/http", "22/tcp"], "supportPublicIp": True,
             "env": {"PYTHONUNBUFFERED": "1"}, "dockerStartCmd": ["bash", "-c", boot]}
+    if a.min_vcpu:
+        base["minVCPUPerGPU"] = a.min_vcpu
+    if a.min_ram:
+        base["minRAMPerGPU"] = a.min_ram
     if a.dry:
         print(json.dumps(base, indent=1))
         return
