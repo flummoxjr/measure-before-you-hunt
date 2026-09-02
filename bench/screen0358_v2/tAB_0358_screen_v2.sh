@@ -19,8 +19,8 @@
 # THE HONESTY FRAME (pre-registered, sha-logged as status line 3 before any
 # provisioning or data): the Aug-25 'chance on a clean foreign scroll' number
 # (0.5382) is VOID -- it fed 2.215um data as 4.32um (bench/P2A_PITCH_RESOLUTION.md).
-# The corrected 500p2a anchor (bench/p2a_v3, iso, best direction) is @@A3@@:
-# @@A3_READING@@. PHerc0358 is a foreign scroll; a blank screen bounds
+# The corrected 500p2a anchor (bench/p2a_v3, iso, best direction) is 0.5211:
+# transfer failure confirmed at the correct pitch: ink_9um reads at chance on 500p2a with the pitch fault removed (iso fwd 0.5211 / rev 0.5106; fit17 0.5301 / 0.5099), while the same harness read the in-domain w035 control at 0.9991 and reproduced the scale fault on it (0.749). PHerc0358 is a foreign scroll; a blank screen bounds
 # sensitivity only to the extent that anchor does. The run's value:
 # (a) first-ever look at this scroll's surfaces, (b) the maps + meshes as
 # community artifacts, (c) any local battery flag would be extraordinary and
@@ -209,7 +209,7 @@ cat > "$OUT/prereg.json" <<'PREREG_JSON'
 {
   "locked_before": "any provisioning, download, or data contact on this pod; full document PREREG_0358.md (sha256 1a87022385584881b25be20b511ac63457c7b05154a80a55590499d807f5814d) written 2026-08-25 and amended by adversarial review the same day, before launch and before any PHerc0358 data existed",
   "experiment": "first-ever ink screen of PHerc0358's first-ever surfaces: 8 gate-PASS patches (commit 0d902ef), render 21-slice SV from the masked 9.362um CT, infer ink_9um seed42 forward+reverse, save maps+stats. MEASUREMENT ONLY -- no battery statistic, gate, or verdict is computed on this pod.",
-  "expected_outcome": "NULL with sensitivity bounded by the CORRECTED foreign-scroll anchor: the Aug-25 0.5382/0.5055 is VOID (2.215um data fed as 4.32um; bench/P2A_PITCH_RESOLUTION.md); bench/p2a_v3 measured the corrected 500p2a win1 anchor at @@A3@@ (@@A3_READING@@). PHerc0358 is likewise foreign to ink_9um. A blank screen is NOT evidence these patches carry no text; a flag goes to escalation, never announcement.",
+  "expected_outcome": "NULL with sensitivity bounded by the CORRECTED foreign-scroll anchor: the Aug-25 0.5382/0.5055 is VOID (2.215um data fed as 4.32um; bench/P2A_PITCH_RESOLUTION.md); bench/p2a_v3 measured the corrected 500p2a win1 anchor at 0.5211 (transfer failure confirmed at the correct pitch: ink_9um reads at chance on 500p2a with the pitch fault removed (iso fwd 0.5211 / rev 0.5106; fit17 0.5301 / 0.5099), while the same harness read the in-domain w035 control at 0.9991 and reproduced the scale fault on it (0.749)). PHerc0358 is likewise foreign to ink_9um. A blank screen is NOT evidence these patches carry no text; a flag goes to escalation, never announcement.",
   "v2_changes": "canonical canvas round(h/scale) (villa Tifxyz.shape int() truncation gave 3039 on 2026-08-25); honesty frame re-anchored on the corrected 500p2a number; PREREG_0358_v2.md",
   "value_if_null": ["first-ever look at any recoverable surface of this scroll", "maps + correctly-oriented meshes as community artifacts for anyone with a better model", "a matched null for the local battery"],
   "local_battery": "PROTOCOL_V2 (analyze_survey_corpus_v2.py) 5 gates, run LOCALLY after fetch on the pod's strided ds4 npys (map[::4,::4] uint8, 37.448 um/px -- the exact survey_segments.py decimation the 71-segment corpus and the w035_CONTROL_strided control used; ds8 npys are preview-only) of the FORWARD maps; reverse maps descriptive only; gate 5 from the pod's full-res fwd/rev Pearson r; w035_CONTROL_strided must reproduce 5/5 before any patch is scored",
@@ -225,7 +225,7 @@ cat > "$OUT/prereg.json" <<'PREREG_JSON'
 }
 PREREG_JSON
 PRSHA=$(sha256sum "$OUT/prereg.json" | cut -c1-12)
-say "PREREG locked prereg.json sha256=$PRSHA doc=PREREG_0358_v2.md sha256=${PREREG_MD_SHA:0:12} expected=NULL-with-bounded-sensitivity (corrected transfer anchor @@A3@@; Aug-25 0.5382 VOID) -- rules recorded before any provisioning, download, or data"
+say "PREREG locked prereg.json sha256=$PRSHA doc=PREREG_0358_v2.md sha256=${PREREG_MD_SHA:0:12} expected=NULL-with-bounded-sensitivity (corrected transfer anchor 0.5211; Aug-25 0.5382 VOID) -- rules recorded before any provisioning, download, or data"
 
 # ------------------------------------------------------------ machinery -----
 CURRENT_STAGE=boot

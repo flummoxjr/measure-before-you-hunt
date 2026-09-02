@@ -19,6 +19,18 @@ Prior art that does *not* test this: villa #1582's domain-match arm re-weighted 
 without degrading pooled inputs; histogram matching (Jinhojeong; our f05 doubling) is an intensity
 transform, not a noise/bandwidth transform.
 
+## 1b. Prior weakened before launch (2026-09-02) — read before spending
+
+The corrected 500p2a measurement bears directly on the claim in §1. 500p2a is a **2.215 µm scan pooled to
+9.36 µm** — the same representation family as 24 of ink_9um's 29 training inputs (2.399 µm pooled to 9.6 µm),
+i.e. the *clean* input class the hypothesis says the model has learned priors for. It still reads at chance
+(0.52), with the harness certified on the in-domain control (0.9991). If the transfer gap were mainly
+input-noise mismatch, a pooled-class foreign input should transfer *better* than native — it does not.
+Bet A's honest prior therefore drops (from ~25–35% to ~10–15%); the failure looks scroll-specific (texture /
+ink prior), which is Bet C's premise (corpus size, not acquisition domain). Recommendation for the weekly gate
+review: run arm 0 (the LOSO anchor, needed by every bet) and decide on arms 1/2 only after Bet C's first
+number, unless the local 4090 is idle. Recorded here so the decision is visible, not silent.
+
 ## 2. Design
 
 Leave-one-scroll-out on the published ink_9um recipe (`configs/aligned21_hybrid_3d2d.json` +
@@ -55,7 +67,7 @@ STOP: our reproduction of the recipe is wrong and no arm comparison means anythi
 - **PASS** iff, on held-out native 0139, arm 1 *or* arm 2 beats arm 0 by ≥ **+0.05 mean AUC** over the
   five segments (both seeds; the improvement must exceed 2× the arm-0 seed spread), **and** on 500p2a
   win1 (iso) the arm reaches ≥ **max(0.65, A₃ + 0.05)** where A₃ = the corrected anchor from
-  `bench/p2a_v3` (`results/expA_baseline.json → corrected_anchor_auc`). A₃ = ______ (fill from the run).
+  `bench/p2a_v3` (`results/expA_baseline.json → corrected_anchor_auc`). A₃ = **0.5211** (win1 iso forward, `experiments/p2a_v3`, 2026-09-02; fit17 0.5301; win2/win3 in the same results file). Hence the second clause is **500p2a win1 (iso) ≥ 0.65**.
 - **KILLED** otherwise. The augmentation code, configs and held-out numbers ship either way.
 - If A₃ ≥ 0.85 the second clause is replaced by "does not *reduce* 500p2a below A₃ − 0.03" (the anchor
   is then already at curve-anchoring quality and the bet is about the native tier only).

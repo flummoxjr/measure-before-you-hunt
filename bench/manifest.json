@@ -19,6 +19,7 @@
       "n_pos": 334035,
       "n_neg": 737086,
       "on_record": {"forward_full_canvas": 0.9991, "reverse_full_canvas": 0.5123},
+      "measured_2026-09-02": {"native_forward": 0.9991, "native_reverse": 0.5118, "level_x1.9504_forward": 0.7489, "level_x1.9504_reverse": 0.5381, "level_x0.5_forward": 0.5227, "level_x0.5_reverse": 0.4844},
       "arms": {
         "native": "as released; pass iff forward >= 0.95",
         "depth_reverse": "--direction reverse; pass iff <= 0.80",
@@ -44,7 +45,7 @@
       },
       "resample_to_model": {"inplane_px": 1050, "depth_iso_layers": 15, "depth_fit17_layers": 17},
       "contamination": "clean for ink_9um; contaminated for ink_3d_dino_guided, ink_canonical_2um, PHerc1667-iteration-0",
-      "results": {"2026-08-25_v2_VOID": {"auc_forward": 0.5382, "auc_reverse": 0.5055, "fault": "fed at 4.80um presented as 9.36"}, "2026-09-01_v3": "pending"}
+      "results": {"2026-08-25_v2_VOID": {"auc_forward": 0.5382, "auc_reverse": 0.5055, "fault": "fed at 4.80um presented as 9.36"}, "2026-09-02_v3": {"pitch_um": 2.215, "win1": {"iso_forward": 0.5211, "iso_reverse": 0.5106, "fit17_forward": 0.5301, "fit17_reverse": 0.5099}, "win2": {"iso_forward": 0.4339, "iso_reverse": 0.4971, "fit17_forward": 0.4481, "fit17_reverse": 0.4897}, "win3": {"iso_forward": 0.4914, "iso_reverse": 0.4956, "fit17_forward": 0.4761, "fit17_reverse": 0.4756}, "corrected_anchor": 0.5211, "expB": "SHAPE_CONFOUNDED on all three windows (real at chance; translated-label nulls up to 0.92)", "controls": {"native_forward": 0.9991, "native_reverse": 0.5118, "level_x1.9504": 0.7489, "level_x0.5": 0.5227}, "record": "trackD/out/p2a_v3/results.json"}}
     },
     "pherc0139_native": {
       "tier": "native held-out (leave-one-scroll-out)",
