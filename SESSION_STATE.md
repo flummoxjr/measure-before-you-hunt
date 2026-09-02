@@ -41,16 +41,16 @@ and the 0358 v1 prereg is unverified until the corrected number below lands. Not
 | Transfer benchmark v0.1 | `bench/BENCHMARK.md`, `bench/manifest.json`, scorer = p2a_v3 curvelib, `bench/vendor/make_holdout_config.py` (khj1222 PR #1608 @ dc9edb6) + recipe configs; offline LOSO test reproduces quotas {1667: 40, Paris4: 20, 0814: 4} | done; release after p2a_v3 |
 | Bet A prereg | `PREREG_BET_A_DRAFT.md` — gate needs A₃ filled, then commit before any training | draft |
 | Canvas off-by-one root cause | villa `tifxyz/types.py` `int(h/scale)` with float32-rounded scale 0.05000000074505806 → 3039 (and w035's 5819×5239); fixed in `runpod/render_tifxyz_sv.py` (canonical `round(h/scale)` canvas); Track B draft `issue_drafts/filing/tifxyz_fullres_shape_truncation.md` (Ben-gated) | done |
-| 0358 screen v2 | `bench/screen0358_v2/` — v1 gist patched with the canvas fix + the corrected honesty frame (A₃ = 0.5211 filled); `PREREG_0358_v2.md` (sha dcfa3de67cf0); gist `gist_raw_url.txt`. **LAUNCHED 02:58 UTC** via `bench/tools/launch_pod.py` → `experiments/screen0358c/` (guard deadline 3 h). Then: local battery on the ds4 npys | in flight |
+| 0358 screen v2 | `bench/screen0358_v2/` — v1 gist patched with the canvas fix + the corrected honesty frame (A₃ = 0.5211 filled); `PREREG_0358_v2.md` (sha dcfa3de67cf0); gist `gist_raw_url.txt`. **DONE 03:27 UTC** (pod `pou3y6h4s7gp7i`, 32 min, ≈ $0.37): 8/8 healthy on the canonical 3040 canvas, 0 tripwires, fwd/rev r 0.45–0.59 on every patch (control 0.094; corpus min 0.22 → gate 5 fails on all 8 before any periodicity test), hot pixels 0.2–1 % speckle. `bench/screen0358_v2/RESULTS.md`; records `out/screen0358_v2/`, `experiments/screen0358c/` (guard + mirror). The pod script does NOT bundle — `bench/tools/mirror_pod_out.sh` + `scripts/pod_guard.py --fetch-dirs maps,previews,results` saved the maps. Local PROTOCOL_V2 battery (`run_battery_0358.py`, 10 units × 200 perms) running → `out/screen0358_v2/battery_0358.json` | battery running |
 | pod_guard "ALL DONE" substring bug | already fixed 2026-08-25 (line-anchored regex) | verified |
 
 ## Next actions, in order
 
 1. (done 2026-09-02 03:00) results read, plan docs + artifact corrected, A₃ in the Bet A draft, manifest updated,
    committed; mirrors synced with `bench/tools/sync_gp13.sh`.
-2. 0358 screen v2 in flight (`experiments/screen0358c/`): when the guard harvests `bundle.tgz`, run the local battery
-   (`analyze_survey_corpus_v2.py` on the ds4 npys; w035_CONTROL_strided must reproduce 5/5 first); any flag →
-   escalation only, never announcement.
+2. 0358 screen v2 measured; battery running (`experiments/screen0358c/battery.log`). When it finishes: fill the battery
+   table in `bench/screen0358_v2/RESULTS.md` (w035_CONTROL_strided must be 5/5; flag rule ≥ 4/5 → escalation only, never
+   announcement), commit, `bash bench/tools/sync_gp13.sh`. Expected: 0 flags (gate 5 already fails on all 8).
 3. Lane A Week-2 items: Bet A arm 0 (LOSO anchor reproduction) on a pod — the training data is HF
    `ink_9um/labels/{aligned-scrollprizeorg-21slices,native9-scrollprizeorg-21slices}` + S3 surface volumes
    (24 pooled + 5 native); recipe `bench/vendor/configs/`. zroll ladder (`gist_raw.txt`, `experiments/zroll`
@@ -71,4 +71,6 @@ and the 0358 v1 prereg is unverified until the corrected number below lands. Not
 - Both repos: `measure-before-you-hunt` (private, canonical working truth = local trackD) and
   `gp13-ink-detectability` (public, what the Aug form cited); keep trees identical.
 - `.venv` (3.12) has numpy/scipy/tifffile/PIL; anything importing `vesuvius` needs `.venv314`.
+- `scripts/pod_guard.py` lives OUTSIDE the trackD git repo (project root is not a repo); its 2026-09-02 `--fetch-dirs/--fetch-files`
+  change is on disk only. Pod scripts that write results under served subdirs need those flags or a bundle.tgz.
 - GPU laptop was busy (87%) all evening — no local runs were attempted.

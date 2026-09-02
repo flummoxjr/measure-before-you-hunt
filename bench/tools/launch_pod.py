@@ -47,23 +47,29 @@ def main():
     ap.add_argument("--no-status-min", type=float, default=15)
     ap.add_argument("--disk", type=int, default=80)
     ap.add_argument("--min-balance", type=float, default=40.0)
+    ap.add_argument("--image", default=IMAGE, help="container image (default: runpod pytorch)")
+    ap.add_argument("--pre", default="", help="shell snippet run before curl (e.g. apt-get install curl python3 on images without them)")
+    ap.add_argument("--gpus", default="", help="comma list of 'GPU TYPE/CLOUD' attempts, e.g. 'NVIDIA GeForce RTX 4090/COMMUNITY,NVIDIA GeForce RTX 5090/COMMUNITY'")
     ap.add_argument("--dry", action="store_true")
     a = ap.parse_args()
-    boot = ("mkdir -p /workspace && cd /workspace && "
+    attempts = ATTEMPTS
+    if a.gpus:
+        attempts = [tuple(x.rsplit("/", 1)) for x in a.gpus.split(",") if x]
+    boot = (a.pre + " mkdir -p /workspace && cd /workspace && "
             f"for i in 1 2 3 4 5 6; do curl -fsSL '{a.gist}' -o {a.script} && break; sleep 15; done; "
             f"sed -i 's/\\r$//' {a.script}; exec bash {a.script}")
     me = gql("query { myself { clientBalance currentSpendPerHr pods { id name } } }")["myself"]
     print(f"balance ${me['clientBalance']:.2f} burn ${me['currentSpendPerHr']}/hr pods={me['pods']}")
     assert me["clientBalance"] > a.min_balance, "balance below floor"
     assert not me["pods"], "another pod is running; refusing to double-launch"
-    base = {"name": a.name, "imageName": IMAGE, "gpuCount": 1, "containerDiskInGb": a.disk,
+    base = {"name": a.name, "imageName": a.image, "gpuCount": 1, "containerDiskInGb": a.disk,
             "volumeInGb": 0, "ports": ["8000/http", "22/tcp"], "supportPublicIp": True,
             "env": {"PYTHONUNBUFFERED": "1"}, "dockerStartCmd": ["bash", "-c", boot]}
     if a.dry:
         print(json.dumps(base, indent=1))
         return
     pod = None
-    for gpu, cloud in ATTEMPTS:
+    for gpu, cloud in attempts:
         r = requests.post(f"{REST}/pods", headers=H, data=json.dumps(dict(base, gpuTypeIds=[gpu], cloudType=cloud)), timeout=120)
         if r.status_code >= 300:
             print(f"{gpu}/{cloud}: HTTP {r.status_code} {r.text[:200]}")
