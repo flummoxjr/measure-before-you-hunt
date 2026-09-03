@@ -52,16 +52,25 @@ else
     C=$(curl -s -o /dev/null --max-time 20 -w "%{http_code}" "$U" || echo 000); say "PREFLIGHT $U -> http $C"
   done
   if awk -v s="$PF_MBS" 'BEGIN{exit !(s < 1.0)}'; then die "PREFLIGHT: files.pythonhosted.org ${PF_MBS} MB/s (< 1 MB/s) from this host; relaunch on another host/cloud"; fi
-  retry 3 timeout 2400 "$OIVENV/bin/pip" install -q --timeout 180 --retries 8 -r "$OID/requirements.txt" >> "$OUT/logs/provision.log" 2>&1 || die "pip install -r requirements.txt failed (logs/provision.log)"
+  # 2026-09-03 pod 0q61zt4fkn0nki: `torch>=2.0.0` in requirements.txt pulled torch 2.14.0 over the image's
+  # 2.8 build (torchvision/torchaudio then mismatched; the import check died). Constrain torch* to the image's versions.
+  "$OIVENV/bin/python" -c 'import importlib
+for m in ("torch", "torchvision", "torchaudio"):
+    try:
+        print(f"{m}=={importlib.import_module(m).__version__}")
+    except Exception:
+        pass' > "$VAR/constraints.txt"
+  say "provision: pip constraints: $(tr '\n' ' ' < "$VAR/constraints.txt")"
+  retry 3 timeout 2400 "$OIVENV/bin/pip" install -q --timeout 180 --retries 8 -c "$VAR/constraints.txt" -r "$OID/requirements.txt" >> "$OUT/logs/provision.log" 2>&1 || die "pip install -r requirements.txt failed (logs/provision.log)"
   "$OIVENV/bin/pip" install -q numpy scipy tifffile opencv-python-headless >> "$OUT/logs/provision.log" 2>&1 || true
-  "$OIVENV/bin/python" - <<'PY' || die "optimized_inference import check failed"
+  "$OIVENV/bin/python" - <<'PY' >> "$OUT/logs/provision.log" 2>&1 || { tail -14 "$OUT/logs/provision.log" | while read -r L; do say "import: $L"; done; die "optimized_inference import check failed"; }
 import sys, os
 sys.path.insert(0, os.path.join(os.environ["OI"], "ink-detection", "optimized_inference"))
 import torch, zarr, s3fs, pytorch_lightning
 import processing, inference
 print("OI_IMPORT_OK torch", torch.__version__, "cuda", torch.cuda.is_available(), "zarr", zarr.__version__, "lightning", pytorch_lightning.__version__)
 PY
-  say "provision: OI_IMPORT_OK"
+  say "provision: $(grep OI_IMPORT_OK "$OUT/logs/provision.log" | tail -1)"
   stage_close provision
 fi
 OID="$OI/ink-detection/optimized_inference"
