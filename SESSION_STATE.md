@@ -89,3 +89,8 @@ and the 0358 v1 prereg is unverified until the corrected number below lands. Not
 - GPU laptop was busy (87%) all evening — no local runs were attempted.
 - **Claude usage cap** hit ~04:05 UTC 2026-09-02 (monthly spend limit; resets 2 am America/Chicago): the two research agents were
   killed mid-task (Bet A pod-script agent wrote nothing; corpus agent wrote the manifest only). Until it resets, no subagents.
+
+### 2026-09-03 02:28 UTC — w059/C0 pod launched (ef8tzdyssyk0b8)
+- `bench/w059_c0/pod_w059_c0.sh` (sha 418747f13a99597d) committed as 8c856b2 BEFORE launch (prereg locked in-script; C0 gate r>=0.90 vs the published w035 A map; then w035 B-arm L1 control; then w059 B-arm L1 fwd+rev at full coverage; ds4/ds16 maps for the local PROTOCOL_V2 battery). Gist raw URL in `bench/w059_c0/gist_raw_url.txt`.
+- Pod ef8tzdyssyk0b8 (5090 community, 12 vCPU, $0.69/h), guard 5 h / no-status 20 min, `--fetch-files results.json,bundle.tgz,status.txt`, out dir `experiments/w059_c0/`. Runs CONCURRENTLY with smoke #2 (9wj9g2rrwkkjcr) via `--allow-concurrent`; both landed on host suffix 644111c4 and both were still runtime=null at 02:31 (10 min for the smoke pod) — if a no-status abort fires, relaunch on a different GPU/cloud attempt order.
+- gp13 resynced at 3212cad (tree 364d10b3…) after 8c856b2.
