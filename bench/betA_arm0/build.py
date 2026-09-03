@@ -57,6 +57,8 @@ def main():
         ("cfggen.py", "PY_CFGGEN", read(os.path.join(P, "cfggen.py"))),
         ("evalf1.py", "PY_EVALF1", read(os.path.join(P, "evalf1.py"))),
         ("finalize.py", "PY_FINAL", read(os.path.join(P, "finalize.py"))),
+        ("measure_inputs.py", "PY_MEASURE", read(os.path.join(P, "measure_inputs.py"))),
+        ("k2b_index.json", "JSON_K2B", read(os.path.join(P, "k2b_index.json"))),
     ]
     # make_holdout_config.py looks for configs/ next to its parent dir by default; we pass --recipe/--contract explicitly.
     scripts = ("# ============================================================================\n"
@@ -93,6 +95,11 @@ def main():
   retry 3 timeout 2400 uv sync --extra models"""
     assert old_sync in prov, "uv sync anchor"
     prov = prov.replace(old_sync, new_sync)
+    # Bet A arms 1/2 live on the fork branch betA-arms (VILLA_PIN_REF); master stays the arm-0 snapshot a3f2c29.
+    old_clone = "git clone --depth 1 https://github.com/flummoxjr/villa-pin-37e300d3.git villa"
+    assert old_clone in prov, "villa-pin clone anchor"
+    prov = prov.replace(old_clone, 'git clone --depth 1 --branch "$VILLA_PIN_REF" https://github.com/flummoxjr/villa-pin-37e300d3.git villa')
+    prov = prov.replace('  say "provision: villa @ $VSHA"', '  say "provision: villa @ $VSHA (villa-pin ref $VILLA_PIN_REF, Bet A arm $ARM)"')
     stages = stages.replace("@@PROVISION_AND_CKPT@@", prov)
     assert "@@" not in stages
     header = read(os.path.join(P, "header.sh"))

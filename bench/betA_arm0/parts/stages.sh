@@ -136,8 +136,8 @@ else
   stage_open ctl
   retry 3 pyrun "$SCRIPTS/ctl_build.py" fetch || die "ctl chunk fetch failed"
   pyrun "$SCRIPTS/ctl_build.py" build || die "ctl build failed"
-  for ARM in ctl_native ctl_scalefault ctl_half; do
-    run_infer "$DATA/$ARM.zarr" "$PREDS/$ARM.tif" both
+  for CARM in ctl_native ctl_scalefault ctl_half; do
+    run_infer "$DATA/$CARM.zarr" "$PREDS/$CARM.tif" both
   done
   RC=0
   pyrun "$SCRIPTS/ctl_score.py" || RC=$?
@@ -148,6 +148,18 @@ else
 fi
 
 # ============================================================================
+# ============================================================================
+# STAGE measure -- input statistics with the arm-1 estimator (pooled vs native vs index targets);
+# reported before any arm-1 training so the degradation's activity is known (prereg gate).
+# ============================================================================
+if stage_done measure; then
+  say "=== STAGE measure already done, skipping ==="
+else
+  stage_open measure
+  pyrun "$SCRIPTS/measure_inputs.py" "$VOLS/aligned9" "$NATIVE" "$SCRIPTS/k2b_index.json" 64 128 || die "input statistics failed"
+  stage_close measure
+fi
+
 # STAGES train_s<seed> / eval_s<seed>
 # ============================================================================
 train_seed() { # train_seed <seed>
