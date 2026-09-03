@@ -1,1 +1,1 @@
-https://gist.githubusercontent.com/flummoxjr/efe78d2f0cf327133f72332d260a9221/raw/d132b3f97789f108fc84d9acc680f871fe5a1d21/pod_betA_arm0.sh
+https://gist.githubusercontent.com/flummoxjr/5ed84229df04bf10cd7919fd68f54e40/raw/d510f7114fdeadcdd1b21a21fe7ab672f1da113c/pod_betA_arm0.sh
