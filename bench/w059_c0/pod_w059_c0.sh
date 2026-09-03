@@ -717,21 +717,31 @@ run_oi() { # run_oi <tag> <sv s3 path> <start> <end> <reverse true|false>
   if [ -s "$OUTP" ] && [ "$FORCE" != 1 ]; then say "oi skip (exists): $TAG"; return 0; fi
   say "OI OPEN $TAG: $SV layers [$S,$E) reverse=$REV tile 256 stride 128 batch $BATCH_OI"
   local t0=$SECONDS
-  mkdir -p "$PARTS"
-  ( cd "$OID" && MODEL="$MODEL_REPO" MODEL_TYPE=resnet3d-152-3d-decoder STEP=inference NUM_PARTS=1 PART_ID=0 ZARR_OUTPUT_DIR="$PARTS" \
+  # Two villa caches are keyed WITHOUT the volume identity and poisoned every pass after the
+  # first on pod hyj20dywx5vg8a (2026-09-03: the arm-B "control" came out identical to arm A):
+  #   1. processing.get_cached_zarr_store: ZARR_CACHE_DIR defaults to ./zarr_cache (cwd) and the
+  #      LocalStore is keyed by zarr-internal chunk names, so a second S3 volume reads the first
+  #      volume's metadata and chunks  -> give every run its own ZARR_CACHE_DIR and delete it after.
+  #   2. reduce_partitions copies partitions to /tmp/partition_cache/mask_pred_part_000.zarr only
+  #      "if not already cached"                -> wipe /tmp/partition_cache before every reduce.
+  local ZC="$ROOT/zcache_$TAG"
+  rm -rf "$PARTS" "$ZC" /tmp/partition_cache "$OID/zarr_cache" 2>/dev/null || true
+  mkdir -p "$PARTS" "$ZC"
+  ( cd "$OID" && MODEL="$MODEL_REPO" MODEL_TYPE=resnet3d-152-3d-decoder STEP=inference NUM_PARTS=1 PART_ID=0 ZARR_OUTPUT_DIR="$PARTS" ZARR_CACHE_DIR="$ZC" \
       SURFACE_VOLUME_ZARR="$S3/$SV" START_LAYER="$S" END_LAYER="$E" TILE_SIZE=256 STRIDE=128 BATCH_SIZE="$BATCH_OI" FORCE_REVERSE="$REV" \
       OUTPUT_PATH="$OUTP" COMPILE=0 PROFILING_LEVEL=basic "$OIVENV/bin/python" entrypoint.py > "$OUT/logs/oi_$TAG.log" 2>&1 ) || {
     tail -15 "$OUT/logs/oi_$TAG.log" | while read -r L; do say "oi_$TAG: $L"; done
     return 1; }
-  say "OI inference $TAG done ($((SECONDS - t0))s); partitions $(du -sh "$PARTS" 2>/dev/null | cut -f1); reduce next"
-  ( cd "$OID" && MODEL="$MODEL_REPO" MODEL_TYPE=resnet3d-152-3d-decoder STEP=reduce NUM_PARTS=1 ZARR_OUTPUT_DIR="$PARTS" \
+  say "OI inference $TAG done ($((SECONDS - t0))s); partitions $(du -sh "$PARTS" 2>/dev/null | cut -f1); zarr cache $(du -sh "$ZC" 2>/dev/null | cut -f1); reduce next"
+  rm -rf /tmp/partition_cache 2>/dev/null || true
+  ( cd "$OID" && MODEL="$MODEL_REPO" MODEL_TYPE=resnet3d-152-3d-decoder STEP=reduce NUM_PARTS=1 ZARR_OUTPUT_DIR="$PARTS" ZARR_CACHE_DIR="$ZC" \
       SURFACE_VOLUME_ZARR="$S3/$SV" START_LAYER="$S" END_LAYER="$E" TILE_SIZE=256 STRIDE=128 FORCE_REVERSE="$REV" \
       OUTPUT_PATH="$OUTP" PROFILING_LEVEL=basic "$OIVENV/bin/python" entrypoint.py > "$OUT/logs/oi_${TAG}_reduce.log" 2>&1 ) || {
     tail -15 "$OUT/logs/oi_${TAG}_reduce.log" | while read -r L; do say "oi_${TAG}_reduce: $L"; done
     return 1; }
   [ -s "$OUTP" ] || { say "oi_$TAG: no output written after reduce; preds/: $(ls "$PREDS" | tr '\n' ' ')"; tail -8 "$OUT/logs/oi_${TAG}_reduce.log" | while read -r L; do say "oi_${TAG}_reduce: $L"; done; return 1; }
-  rm -rf "$PARTS" /tmp/prediction_*.tif 2>/dev/null || true
-  say "OI DONE $TAG ($((SECONDS - t0))s): $(du -h "$OUTP" | cut -f1)"
+  rm -rf "$PARTS" "$ZC" /tmp/partition_cache /tmp/prediction_*.tif 2>/dev/null || true
+  say "OI DONE $TAG ($((SECONDS - t0))s): $(du -h "$OUTP" | cut -f1) $(pyrun -c "import tifffile;print(tifffile.imread('$OUTP').shape)" 2>/dev/null)"
 }
 
 # ============================================================================
