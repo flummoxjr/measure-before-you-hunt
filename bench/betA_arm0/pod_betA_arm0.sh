@@ -172,7 +172,8 @@ cat > "$OUT/prereg.json" <<'PREREG_JSON'
   },
   "cost_cap": "4 pods x <= 15 h guard; about $5 per pod on a community 5090"
  }
-}PREREG_JSON
+}
+PREREG_JSON
 PRSHA=$(sha256sum "$OUT/prereg.json" | cut -c1-12)
 say "PREREG locked prereg.json sha256=$PRSHA -- decision rules recorded before any provisioning, download, or data"
 

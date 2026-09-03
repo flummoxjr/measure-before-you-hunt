@@ -40,10 +40,8 @@ def main():
     mach_b = "\n".join(p2a[i_prsha:i_sep])
     assert "run_infer()" in mach_b and "pyrun()" in mach_b and "stage_open()" in mach_b
     prereg = read(os.path.join(P, "prereg.json")); json.loads(prereg)
-    if not prereg.endswith("
-"):
-        prereg += "
-"   # 2026-09-03: a newline-less JSON glued the heredoc terminator to its last line and swallowed the script
+    if not prereg.endswith(chr(10)):
+        prereg += chr(10)   # 2026-09-03: a newline-less JSON glued the heredoc terminator to its last line and swallowed the script
     prereg_block = "cat > \"$OUT/prereg.json\" <<'PREREG_JSON'\n" + prereg + "PREREG_JSON\n"
     manifest = read(os.path.join(HERE, "data_manifest.json")); json.loads(manifest)
     programs = [
