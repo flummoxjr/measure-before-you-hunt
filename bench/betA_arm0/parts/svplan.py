@@ -78,7 +78,12 @@ def plan():
     for seg in SV:
         cols, ncorner = plan_one(seg)
         exp = int(SV[seg]["chunks_planned_sparse"])
-        lo, hi = 0.5 * exp, 1.25 * exp
+        # Our rule (patch corners +128 px, then +1 chunk of dilation) is systematically
+        # ~1.15-1.26x the manifest's "+-128 px max-filter" estimate (measured on the
+        # 2026-09-03 smoke: w013 1.17, w018 1.18, w023 1.19, w028 1.18, w029 1.26).
+        # The band is a sanity check against a broken plan, not a budget: the budget
+        # is the 45 GB total cap below.
+        lo, hi = 0.5 * exp, 1.6 * exp
         ok = lo <= len(cols) <= hi
         cl.say(f"SVPLAN {seg}: {ncorner} patch corners -> {len(cols)} chunk columns "
                f"(manifest {exp}; {'OK' if ok else 'OUT OF BAND'})")

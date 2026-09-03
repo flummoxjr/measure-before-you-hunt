@@ -74,24 +74,44 @@ def sync_store(family, seg, store_name, expect):
     cl.say(f"HFSYNC {seg}/{store_name}: {len(entries)} files listed, {skipped} all-zero skipped, "
            f"{len(todo)} to fetch")
     done = [0]
+    failed = []
 
     def one(item):
         path, dest, size = item
-        body, _ = http(RESOLVE + path)
-        if body is None:
-            raise RuntimeError(f"404 on listed file {path}")
-        if len(body) != size:
-            raise RuntimeError(f"size mismatch {path}: {len(body)} != {size}")
-        os.makedirs(os.path.dirname(dest), exist_ok=True)
-        tmp = dest + ".part"
-        with open(tmp, "wb") as f:
-            f.write(body)
-        os.replace(tmp, dest)
-        done[0] += 1
-        if done[0] % 500 == 0:
-            cl.say(f"HFSYNC {seg}/{store_name}: {done[0]}/{len(todo)}")
+        try:
+            body = None
+            for attempt in range(4):
+                body, _ = http(RESOLVE + path)
+                if body is not None:
+                    break
+                time.sleep(5 * (attempt + 1))       # listed-but-404: xet propagation lag, retry
+            if body is None:
+                raise RuntimeError(f"404 on listed file {path}")
+            if len(body) != size:
+                raise RuntimeError(f"size mismatch {path}: {len(body)} != {size}")
+            os.makedirs(os.path.dirname(dest), exist_ok=True)
+            tmp = dest + ".part"
+            with open(tmp, "wb") as f:
+                f.write(body)
+            os.replace(tmp, dest)
+            done[0] += 1
+            if done[0] % 500 == 0:
+                cl.say(f"HFSYNC {seg}/{store_name}: {done[0]}/{len(todo)}")
+        except Exception as e:                      # collect; retried below at low concurrency
+            failed.append((item, f"{type(e).__name__}: {str(e)[:160]}"))
     with ThreadPoolExecutor(max_workers=THREADS) as ex:
         list(ex.map(one, todo))
+    if failed:
+        cl.say(f"HFSYNC {seg}/{store_name}: {len(failed)} files failed at {THREADS} threads "
+               f"(first: {failed[0][1]}); retrying them at 4 threads after 30 s")
+        time.sleep(30)
+        retry_items = [f[0] for f in failed]
+        failed.clear()
+        with ThreadPoolExecutor(max_workers=4) as ex:
+            list(ex.map(one, retry_items))
+        if failed:
+            cl.say(f"HFSYNC {seg}/{store_name}: STILL FAILING {len(failed)}: {failed[0][1]}")
+            raise RuntimeError(f"{seg}/{store_name}: {len(failed)} files could not be fetched")
     # metadata gates
     for fn, key in ((".zattrs", "zattrs"), ("0/.zarray", "zarray_0")):
         p = os.path.join(local_store, fn)
