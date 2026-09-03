@@ -57,8 +57,14 @@ def main():
     ap.add_argument("--fetch-dirs", default="", help="passed to pod_guard: served dirs to mirror before terminating")
     ap.add_argument("--fetch-files", default="", help="passed to pod_guard: served files to save before terminating (also on FAILED/deadline)")
     ap.add_argument("--allow-concurrent", action="store_true", help="permit a launch while another pod is running (default: refuse, to prevent accidental double-launches)")
+    ap.add_argument("--avoid-host", default="", help="comma list of podHostId suffixes to refuse: a matching pod is terminated at once and the attempt list continues (host ...-644111c4 never booted 3 pods on 2026-09-03)")
     ap.add_argument("--dry", action="store_true")
     a = ap.parse_args()
+    a.avoid_host_retries = 4
+    return main_with(a)
+
+
+def main_with(a):
     attempts = ATTEMPTS
     if a.gpus:
         attempts = [tuple(x.rsplit("/", 1)) for x in a.gpus.split(",") if x]
@@ -120,6 +126,26 @@ def main():
         print("ALL ATTEMPTS FAILED")
         sys.exit(2)
     pid = pod["id"]
+    if a.avoid_host:
+        bad = [x.strip() for x in a.avoid_host.split(",") if x.strip()]
+        host = ""
+        for _ in range(6):
+            try:
+                host = (gql("query ($id: String!) { pod(input: {podId: $id}) { machine { podHostId } } }", {"id": pid})["pod"]["machine"] or {}).get("podHostId") or ""
+            except Exception as e:
+                print("  host query error", str(e)[:100])
+            if host:
+                break
+            time.sleep(5)
+        print(f"  host {host}")
+        if any(host.endswith(b) for b in bad):
+            r = requests.delete(f"{REST}/pods/{pid}", headers=H, timeout=60)
+            print(f"AVOIDED host {host}: terminated {pid} (http {r.status_code}); relaunching once on the same attempt list")
+            if a.avoid_host_retries > 0:
+                a.avoid_host_retries -= 1
+                time.sleep(10)
+                return main_with(a)
+            print("host avoidance exhausted"); sys.exit(3)
     Path(a.out).mkdir(parents=True, exist_ok=True)
     (Path(a.out) / "pod_id.txt").write_text(pid)
     t0 = time.time()
