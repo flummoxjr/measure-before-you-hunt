@@ -61,6 +61,7 @@ def main():
     ap.add_argument("--dry", action="store_true")
     a = ap.parse_args()
     a.avoid_host_retries = 4
+    a.skip_attempts = set()
     return main_with(a)
 
 
@@ -68,6 +69,9 @@ def main_with(a):
     attempts = ATTEMPTS
     if a.gpus:
         attempts = [tuple(x.rsplit("/", 1)) for x in a.gpus.split(",") if x]
+    attempts = [t for t in attempts if t not in a.skip_attempts]
+    if not attempts:
+        print("no attempts left after host avoidance"); sys.exit(3)
     boot = (a.pre + " mkdir -p /workspace && cd /workspace && "
             f"for i in 1 2 3 4 5 6; do curl -fsSL '{a.gist}' -o {a.script} && break; sleep 15; done; "
             f"sed -i 's/\\r$//' {a.script}; exec bash {a.script}")
@@ -143,6 +147,7 @@ def main_with(a):
             print(f"AVOIDED host {host}: terminated {pid} (http {r.status_code}); relaunching once on the same attempt list")
             if a.avoid_host_retries > 0:
                 a.avoid_host_retries -= 1
+                a.skip_attempts.add((gpu, cloud))  # that pool keeps landing on the bad host: move down the list
                 time.sleep(10)
                 return main_with(a)
             print("host avoidance exhausted"); sys.exit(3)
